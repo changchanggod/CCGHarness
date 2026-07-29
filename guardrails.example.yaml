@@ -1,0 +1,19 @@
+rules:
+  - pattern: "rm\\s+(-[rRf]+\\s+)+[/~]"
+    score: 100
+    description: "Recursive force delete on root/home"
+  - pattern: "git\\s+push\\s+.*--force"
+    score: 60
+    description: "Force push to remote"
+  - pattern: "npm\\s+publish"
+    score: 40
+    description: "NPM publish"
+  - pattern: "shutdown|reboot|halt"
+    score: 100
+    description: "System shutdown/reboot/halt"
+  - pattern: "/dev/"
+    score: 80
+    description: "Write to /dev/ device"
+  - pattern: "chmod\\s+777"
+    score: 50
+    description: "chmod 777 (world-writable)"

@@ -9,7 +9,7 @@ export interface ToolResult {
   success: boolean;
   output: string;
   error?: string;
-  metadata?: { exitCode: number; stderr: string };
+  metadata?: Record<string, unknown>;
 }
 
 export interface Issue {
@@ -68,7 +68,7 @@ export type ApprovalState = "idle" | "waiting" | "approved" | "denied" | "timeou
 export type ApprovalDecision = "approve" | "deny" | "approve_all";
 
 export interface ConversationTurn {
-  role: "user" | "assistant" | "tool";
+  role: "user" | "assistant" | "tool" | "system";
   content: string;
   timestamp: number;
   tokenCount: number;
