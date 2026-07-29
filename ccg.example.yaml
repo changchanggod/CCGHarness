@@ -1,0 +1,29 @@
+llm:
+  provider: openai
+  model: gpt-4o
+  max_rounds: 20
+  temperature: 0.1
+
+guardrails:
+  rules_file: guardrails.yaml
+  hitl_enabled: true
+  hitl_timeout: 120
+  sandbox:
+    workspace: "."
+    allowed_commands: []
+    blocked_commands: []
+    allow_network: false
+
+tools:
+  enabled:
+    - read_file
+    - write_file
+    - shell
+    - run_tests
+    - run_lint
+
+feedback:
+  auto_lint: true
+  auto_test: true
+  test_command: "npm test"
+  lint_command: "npm run lint"
