@@ -5,3 +5,6 @@ dist/
 .idea
 *.tsbuildinfo
 .worktrees/
+sea-prep.blob
+ccg.exe
+ccg
