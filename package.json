@@ -1,0 +1,22 @@
+{
+  "name": "ccg",
+  "type": "module",
+  "dependencies": {
+    "openai": "^4",
+    "@anthropic-ai/sdk": "^0.30",
+    "js-yaml": "^4.1",
+    "commander": "^12"
+  },
+  "devDependencies": {
+    "typescript": "^5.5",
+    "vitest": "^2",
+    "@types/node": "^20",
+    "@types/js-yaml": "^4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  }
+}
