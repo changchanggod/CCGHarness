@@ -9,7 +9,7 @@ export interface ToolResult {
   success: boolean;
   output: string;
   error?: string;
-  metadata?: { exitCode: number; stderr: string };
+  metadata?: Record<string, unknown>;
 }
 
 export interface Issue {
