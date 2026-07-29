@@ -68,7 +68,7 @@ export type ApprovalState = "idle" | "waiting" | "approved" | "denied" | "timeou
 export type ApprovalDecision = "approve" | "deny" | "approve_all";
 
 export interface ConversationTurn {
-  role: "user" | "assistant" | "tool";
+  role: "user" | "assistant" | "tool" | "system";
   content: string;
   timestamp: number;
   tokenCount: number;
