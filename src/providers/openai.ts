@@ -25,7 +25,7 @@ export class OpenAIProvider implements LLMProvider {
       role: msg.role as "system" | "user" | "assistant" | "tool",
       content: msg.content,
       ...(msg.toolCallId ? { tool_call_id: msg.toolCallId } : {}),
-    }));
+    })) as OpenAI.ChatCompletionMessageParam[];
 
     const openaiTools = tools.length > 0
       ? tools.map((tool) => ({
