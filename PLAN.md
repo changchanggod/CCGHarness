@@ -117,13 +117,13 @@ tests/
 - Consumes: nothing (first task)
 - Produces: buildable project skeleton, `npm install && npm test` succeeds (0 tests)
 
-- [ ] **Step 1: Create `package.json`** — name `ccg`, type `module`, dependencies: `openai ^4`, `@anthropic-ai/sdk ^0.30`, `js-yaml ^4.1`, `commander ^12`. devDependencies: `typescript ^5.5`, `vitest ^2`, `@types/node ^20`, `@types/js-yaml ^4`. scripts: `build: tsc`, `test: vitest run`, `test:watch: vitest`, `typecheck: tsc --noEmit`.
-- [ ] **Step 2: Create `tsconfig.json`** — target ES2022, module ESNext, moduleResolution bundler, strict true, outDir dist, rootDir src.
-- [ ] **Step 3: Create `vitest.config.ts`** — include `tests/**/*.test.ts`.
-- [ ] **Step 4: Create `.gitignore`** — node_modules/, dist/, .env, *.log.
-- [ ] **Step 5: Run `npm install`** — verify installs without errors.
-- [ ] **Step 6: Run `npm test`** — verify exit code 0 (0 tests).
-- [ ] **Step 7: Commit** — `git add . && git commit -m "chore: scaffold project with TypeScript and vitest"`
+- [x] **Step 1: Create `package.json`** — name `ccg`, type `module`, dependencies: `openai ^4`, `@anthropic-ai/sdk ^0.30`, `js-yaml ^4.1`, `commander ^12`. devDependencies: `typescript ^5.5`, `vitest ^2`, `@types/node ^20`, `@types/js-yaml ^4`. scripts: `build: tsc`, `test: vitest run`, `test:watch: vitest`, `typecheck: tsc --noEmit`. *(done 2026-07-29; deviations: test script has `--passWithNoTests`, typecheck script retargeted to `tsc --noEmit -p tsconfig.typecheck.json` — user-approved)*
+- [x] **Step 2: Create `tsconfig.json`** — target ES2022, module ESNext, moduleResolution bundler, strict true, outDir dist, rootDir src. *(done 2026-07-29; companion `tsconfig.typecheck.json` added for tests/ coverage)*
+- [x] **Step 3: Create `vitest.config.ts`** — include `tests/**/*.test.ts`. *(done 2026-07-29)*
+- [x] **Step 4: Create `.gitignore`** — node_modules/, dist/, .env, *.log. *(pre-existing file already satisfied; verified 2026-07-29)*
+- [x] **Step 5: Run `npm install`** — verify installs without errors. *(done 2026-07-29, exit 0)*
+- [x] **Step 6: Run `npm test`** — verify exit code 0 (0 tests). *(done 2026-07-29, exit 0)*
+- [ ] **Step 7: Commit** — `git add . && git commit -m "chore: scaffold project with TypeScript and vitest"` *(deferred: user forbade git operations on 2026-07-29)*
 
 ---
 
@@ -136,11 +136,11 @@ tests/
 - Consumes: nothing
 - Produces: `Action`, `ToolResult`, `Issue`, `ValidationResult`, `Message`, `LLMResponse`, `ToolDefinition`, `ClassificationResult`, `CommandCategory`, `RiskLevel`, `GuardrailRule`, `ApprovalState`, `ApprovalDecision`, `ConversationTurn`, `CompressedSummary`, `LoopConfig`, `LoopState`
 
-- [ ] **Step 1: Write failing test** — `tests/core/types.test.ts` validates all types can be constructed with correct shapes.
-- [ ] **Step 2: Run test to verify it fails** — `npx vitest run tests/core/types.test.ts` → FAIL.
-- [ ] **Step 3: Create `src/core/types.ts`** — all interfaces and type aliases from SPEC §6. Detailed type definitions at the end of this plan.
-- [ ] **Step 4: Run test to verify it passes** — PASS.
-- [ ] **Step 5: Commit** — `git add src/core/types.ts tests/core/types.test.ts && git commit -m "feat: add core type definitions"`
+- [x] **Step 1: Write failing test** — `tests/core/types.test.ts` validates all types can be constructed with correct shapes. *(done 2026-07-29, TDD)*
+- [x] **Step 2: Run test to verify it fails** — `npx vitest run tests/core/types.test.ts` → FAIL. *(done 2026-07-29; RED via runtime dynamic-import, 1 failed/23 passed)*
+- [x] **Step 3: Create `src/core/types.ts`** — all interfaces and type aliases from SPEC §6. Detailed type definitions at the end of this plan. *(done 2026-07-29; verbatim transcription, reviewer-verified)*
+- [x] **Step 4: Run test to verify it passes** — PASS. *(done 2026-07-29, 24/24)*
+- [ ] **Step 5: Commit** — `git add src/core/types.ts tests/core/types.test.ts && git commit -m "feat: add core type definitions"` *(deferred: user forbade git operations on 2026-07-29)*
 
 ---
 

@@ -1,0 +1,27 @@
+{
+  "name": "ccg",
+  "version": "0.1.0",
+  "description": "CCGHarness - a coding-agent harness kernel",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30",
+    "commander": "^12",
+    "js-yaml": "^4.1",
+    "openai": "^4"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4",
+    "@types/node": "^20",
+    "typescript": "^5.5",
+    "vitest": "^2"
+  }
+}
