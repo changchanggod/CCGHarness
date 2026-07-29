@@ -118,7 +118,7 @@ tests/
 - Produces: buildable project skeleton, `npm install && npm test` succeeds (0 tests)
 
 - [ ] **Step 1: Create `package.json`** — name `ccg`, type `module`, dependencies: `openai ^4`, `@anthropic-ai/sdk ^0.30`, `js-yaml ^4.1`, `commander ^12`. devDependencies: `typescript ^5.5`, `vitest ^2`, `@types/node ^20`, `@types/js-yaml ^4`. scripts: `build: tsc`, `test: vitest run`, `test:watch: vitest`, `typecheck: tsc --noEmit`.
-- [ ] **Step 2: Create `tsconfig.json`** — target ES2022, module ESNext, moduleResolution bundler, strict true, outDir dist, rootDir src.
+- [ ] **Step 2: Create `tsconfig.json`** — target ES2022, module ESNext, moduleResolution bundler, strict true, outDir dist, rootDir src, include: `["src", "tests"]`. With `include` covering both `src/` and `tests/`, `tsc --noEmit` type-checks all source and test files.
 - [ ] **Step 3: Create `vitest.config.ts`** — include `tests/**/*.test.ts`.
 - [ ] **Step 4: Create `.gitignore`** — node_modules/, dist/, .env, *.log.
 - [ ] **Step 5: Run `npm install`** — verify installs without errors.
