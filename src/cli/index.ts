@@ -1,4 +1,5 @@
 import { program } from "commander";
+import * as readline from "node:readline";
 import { runTask } from "./commands.js";
 import { setupWizard } from "./setup-wizard.js";
 
@@ -16,7 +17,13 @@ program
   .argument("[task]", "Task to execute")
   .option("-c, --config <path>", "Config file path", "ccg.yaml")
   .option("-v, --verbose", "Verbose output", false)
-  .action(async (task: string | undefined, options: { config: string; verbose: boolean }) => {
+  .option("-i, --interactive", "Interactive mode", false)
+  .action(async (task: string | undefined, options: { config: string; verbose: boolean; interactive: boolean }) => {
+    if (options.interactive) {
+      await runInteractive(options.config, options.verbose);
+      return;
+    }
+
     if (!task) {
       console.error("Error: No task provided. Usage: ccg \"your task description\"");
       process.exit(1);
@@ -31,6 +38,57 @@ program
       process.exit(1);
     }
   });
+
+async function runInteractive(configPath: string, verbose: boolean): Promise<void> {
+  console.log("CCG Interactive Mode");
+  console.log("Type a task and press Enter. Type /quit to exit, /help for commands.\n");
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const ask = (): Promise<string> =>
+    new Promise((resolve) => rl.question("ccg> ", resolve));
+
+  while (true) {
+    const input = await ask();
+    const trimmed = input.trim();
+
+    if (!trimmed) continue;
+
+    if (trimmed === "/quit" || trimmed === "/q") {
+      console.log("Goodbye.");
+      break;
+    }
+
+    if (trimmed === "/help" || trimmed === "/h") {
+      console.log("Commands:");
+      console.log("  /quit, /q    Exit interactive mode");
+      console.log("  /help, /h    Show this help");
+      console.log("  /verbose, /v Toggle verbose output");
+      console.log("  <task>       Execute a task\n");
+      continue;
+    }
+
+    if (trimmed === "/verbose" || trimmed === "/v") {
+      verbose = !verbose;
+      console.log(`Verbose: ${verbose ? "on" : "off"}\n`);
+      continue;
+    }
+
+    try {
+      const result = await runTask(trimmed, configPath, verbose);
+      if (!verbose) console.log(`\n${result}\n`);
+      else console.log();
+    } catch (e: unknown) {
+      const err = e as Error;
+      console.error(`Error: ${err.message}\n`);
+    }
+  }
+
+  rl.close();
+}
 
 program
   .command("setup")
