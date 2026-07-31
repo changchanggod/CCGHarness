@@ -1,12 +1,11 @@
 {
   "name": "ccg",
-  "type": "module",
-  "bin": "dist/src/cli/index.js",
+  "bin": "dist/entry.cjs",
   "pkg": {
     "assets": [
+      "dist/**/*",
       "node_modules/**/*"
-    ],
-    "outputPath": "."
+    ]
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30",
