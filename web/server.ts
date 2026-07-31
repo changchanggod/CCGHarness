@@ -2,11 +2,13 @@ import express from "express";
 import path from "node:path";
 import fs from "node:fs";
 import type { Server } from "node:http";
+import { createConfigRouter } from "./routes.js";
 
 export function startServer(port: number): Promise<Server> {
   return new Promise((resolve) => {
     const app = express();
     app.use(express.json());
+    app.use(createConfigRouter());
 
     let publicDir = path.resolve(__dirname, "public");
     if (!fs.existsSync(publicDir)) {
