@@ -48,19 +48,40 @@ async function runInteractive(configPath: string, verbose: boolean): Promise<voi
     output: process.stdout,
   });
 
+  let closed = false;
+
+  rl.on("close", () => {
+    closed = true;
+  });
+
+  process.on("SIGINT", () => {
+    if (!closed) {
+      console.log("\nGoodbye.");
+      rl.close();
+    }
+  });
+
   const ask = (): Promise<string> =>
-    new Promise((resolve) => rl.question("ccg> ", resolve));
+    new Promise((resolve) => {
+      if (closed) {
+        resolve("/quit");
+        return;
+      }
+      rl.question("ccg> ", resolve);
+    });
 
   while (true) {
-    const input = await ask();
+    let input: string;
+    try {
+      input = await ask();
+    } catch {
+      break;
+    }
+
     const trimmed = input.trim();
 
     if (!trimmed) continue;
-
-    if (trimmed === "/quit" || trimmed === "/q") {
-      console.log("Goodbye.");
-      break;
-    }
+    if (trimmed === "/quit" || trimmed === "/q") break;
 
     if (trimmed === "/help" || trimmed === "/h") {
       console.log("Commands:");
@@ -87,7 +108,10 @@ async function runInteractive(configPath: string, verbose: boolean): Promise<voi
     }
   }
 
-  rl.close();
+  if (!closed) {
+    console.log("Goodbye.");
+    rl.close();
+  }
 }
 
 program
