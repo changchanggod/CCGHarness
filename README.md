@@ -36,6 +36,7 @@ npm run build
 
 #### 构建二进制文件
 
+在[从源码构建](#从源码构建)的基础上
 ```bash
 npm run build:sea
 ```
