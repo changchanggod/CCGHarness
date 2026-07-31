@@ -4,7 +4,7 @@ import * as path from "node:path";
 import * as os from "node:os";
 import yaml from "js-yaml";
 import type { LLMProvider } from "../providers/interface.js";
-import type { GuardrailRule, ToolDefinition } from "../core/types.js";
+import type { GuardrailRule, ToolDefinition, ToolResult } from "../core/types.js";
 import type { AppConfig } from "../config/loader.js";
 import { loadConfig } from "../config/loader.js";
 import { getApiKey } from "./setup.js";
@@ -95,6 +95,11 @@ export async function runTask(
   verbose: boolean = false,
   injectProvider?: LLMProvider,
   sharedRl?: readline.Interface,
+  callbacks?: {
+    onToolStart?: (toolName: string, params: Record<string, unknown>) => void;
+    onToolResult?: (toolName: string, success: boolean, output: string) => void;
+    onApprovalRequired?: (request: ApprovalRequest) => Promise<ApprovalDecision>;
+  },
 ): Promise<string> {
   const config = loadConfig(configPath);
 
@@ -138,6 +143,19 @@ export async function runTask(
 
   const tools = createTools(config);
 
+  let effectiveTools = tools;
+  if (callbacks) {
+    effectiveTools = tools.map((tool) => ({
+      ...tool,
+      execute: async (params: Record<string, unknown>) => {
+        callbacks.onToolStart?.(tool.name, params);
+        const result = await tool.execute(params);
+        callbacks.onToolResult?.(tool.name, result.success, result.output);
+        return result;
+      },
+    }));
+  }
+
   const guard = new GuardOrchestrator({
     rules,
     sandboxConfig: {
@@ -148,7 +166,7 @@ export async function runTask(
     },
     hitlEnabled: config.guardrails.hitlEnabled,
     hitlTimeout: config.guardrails.hitlTimeout,
-    onApprovalRequired: createHITLHandler(verbose, sharedRl),
+    onApprovalRequired: callbacks?.onApprovalRequired ?? createHITLHandler(verbose, sharedRl),
   });
 
   const platform = os.platform();
@@ -156,13 +174,13 @@ export async function runTask(
     ? `You are running on Windows. Use Windows commands (dir, findstr, type, del, etc.), not Unix commands (ls, grep, cat, rm). Use 'cmd /c' prefix for shell commands when needed.`
     : `You are running on ${platform}. Use standard Unix/Linux commands.`;
 
-  const toolNames = tools.map((t) => t.name).join(", ");
+  const toolNames = effectiveTools.map((t) => t.name).join(", ");
   const toolHint = `Available tools: ${toolNames}. Use only these tools.`;
 
   const loop = new AgentLoop({
     provider,
     guard,
-    tools,
+    tools: effectiveTools,
     maxRounds: config.llm.maxRounds,
     maxConsecutiveFailures: 3,
     systemPrompt: `You are a coding agent. Complete the user's task using the available tools.\n${platformHint}\n${toolHint}`,
