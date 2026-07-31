@@ -63,6 +63,7 @@ This stores credentials securely via OS-level credential storage (Windows Creden
 **Supported LLM providers:**
 - OpenAI (GPT-4o, GPT-4.1, etc.)
 - Anthropic (Claude Sonnet, Claude Opus, etc.)
+- DeepSeek (DeepSeek-V3, DeepSeek-R1, etc.)
 - Ollama (local models via `http://localhost:11434`)
 
 ## Security Boundaries
@@ -110,7 +111,7 @@ CCGHarness/
 - Requires **Node.js 20+** (uses Node.js Single Executable Applications for binary builds)
 - Binary distribution supports Windows, macOS, and Linux (x64)
 - Binary build requires `postject` (auto-installed as devDependency)
-- Supported LLM providers: OpenAI, Anthropic, Ollama (local)
+- Supported LLM providers: OpenAI, Anthropic, DeepSeek, Ollama (local)
 - Ollama provider requires a running Ollama service at `http://localhost:11434`
 - Shell tool tests use platform-specific commands (Windows `cmd /c`); CI on `ubuntu-latest` may need test adaptation
 - `.env` file support is available but documented as a plaintext risk
