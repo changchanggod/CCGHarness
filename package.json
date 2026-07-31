@@ -31,6 +31,6 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "start:web": "tsc -p web/tsconfig.json && node dist-web/web/server.js",
-    "build:web": "tsc -p web/tsconfig.json"
+    "build:web": "tsc -p web/tsconfig.json && tsc -p web/tsconfig.web.json"
   }
 }
