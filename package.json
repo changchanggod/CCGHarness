@@ -10,12 +10,16 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30",
     "commander": "^12",
+    "express": "^5.2.1",
     "js-yaml": "^4.1",
-    "openai": "^4"
+    "openai": "^4",
+    "ws": "^8.21.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/js-yaml": "^4",
     "@types/node": "^20",
+    "@types/ws": "^8.18.1",
     "pkg": "^5.8.1",
     "typescript": "^5.5",
     "vitest": "^2"
@@ -25,6 +29,8 @@
     "build:sea": "node scripts/build-binary.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "start:web": "tsc -p web/tsconfig.json && node dist-web/web/server.js",
+    "build:web": "tsc -p web/tsconfig.json"
   }
 }
