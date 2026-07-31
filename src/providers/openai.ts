@@ -13,9 +13,13 @@ export class OpenAIProvider implements LLMProvider {
   private model: string;
 
   constructor(config: OpenAIConfig) {
+    if (process.env.DEBUG === "true") {
+      process.env.DEBUG = "false";
+    }
     this.client = new OpenAI({
       apiKey: config.apiKey,
       baseURL: config.baseURL,
+      maxRetries: 0,
     });
     this.model = config.model;
   }
@@ -56,6 +60,7 @@ export class OpenAIProvider implements LLMProvider {
     const response = await this.client.chat.completions.create({
       model: this.model,
       messages: openaiMessages,
+      stream: false,
       ...(openaiTools ? { tools: openaiTools } : {}),
     });
 
