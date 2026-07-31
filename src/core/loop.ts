@@ -54,12 +54,6 @@ export class AgentLoop {
         response = await this.config.provider.chat(messages, this.config.tools);
       } catch {
         this.consecutiveFailures++;
-        this.memory.addTurn({
-          role: "tool",
-          content: "Provider call failed",
-          timestamp: Date.now(),
-          tokenCount: 20,
-        });
         if (this.consecutiveFailures >= this.config.maxConsecutiveFailures) {
           this.finished = true;
           this.finalResult = "Stopped: max consecutive failures reached";
@@ -73,6 +67,7 @@ export class AgentLoop {
         content: JSON.stringify(response.actions),
         timestamp: Date.now(),
         tokenCount: JSON.stringify(response.actions).length,
+        ...(response.toolCalls ? { toolCalls: response.toolCalls } : {}),
       });
 
       for (const action of response.actions) {
@@ -131,6 +126,7 @@ export class AgentLoop {
             content: result.success ? result.output : `Tool error: ${result.error}`,
             timestamp: Date.now(),
             tokenCount: 20,
+            ...(action.toolCallId ? { toolCallId: action.toolCallId } : {}),
           });
 
           if (result.success) {

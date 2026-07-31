@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { Message, LLMResponse, ToolDefinition, Action } from "../core/types.js";
+import type { Message, LLMResponse, ToolDefinition, Action, ToolCallRecord } from "../core/types.js";
 import type { LLMProvider } from "./interface.js";
 
 export interface OpenAIConfig {
@@ -21,11 +21,26 @@ export class OpenAIProvider implements LLMProvider {
   }
 
   async chat(messages: Message[], tools: ToolDefinition[]): Promise<LLMResponse> {
-    const openaiMessages = messages.map((msg) => ({
-      role: msg.role as "system" | "user" | "assistant" | "tool",
-      content: msg.content,
-      ...(msg.toolCallId ? { tool_call_id: msg.toolCallId } : {}),
-    })) as OpenAI.ChatCompletionMessageParam[];
+    const openaiMessages = messages.map((msg) => {
+      const base: Record<string, unknown> = {
+        role: msg.role,
+        content: msg.content,
+      };
+      if (msg.toolCallId) {
+        base.tool_call_id = msg.toolCallId;
+      }
+      if (msg.toolCalls && msg.toolCalls.length > 0) {
+        base.tool_calls = msg.toolCalls.map((tc) => ({
+          id: tc.id,
+          type: "function",
+          function: {
+            name: tc.name,
+            arguments: tc.arguments,
+          },
+        }));
+      }
+      return base;
+    }) as unknown as OpenAI.ChatCompletionMessageParam[];
 
     const openaiTools = tools.length > 0
       ? tools.map((tool) => ({
@@ -45,15 +60,23 @@ export class OpenAIProvider implements LLMProvider {
     });
 
     const actions: Action[] = [];
+    const toolCalls: ToolCallRecord[] = [];
     const choice = response.choices[0];
     const msg = choice.message;
 
     if (msg.tool_calls && msg.tool_calls.length > 0) {
       for (const toolCall of msg.tool_calls) {
+        const args = toolCall.function.arguments || "{}";
         actions.push({
           type: "tool_call",
           toolName: toolCall.function.name,
-          parameters: JSON.parse(toolCall.function.arguments || "{}"),
+          parameters: JSON.parse(args),
+          toolCallId: toolCall.id,
+        });
+        toolCalls.push({
+          id: toolCall.id,
+          name: toolCall.function.name,
+          arguments: args,
         });
       }
     } else {
@@ -65,6 +88,7 @@ export class OpenAIProvider implements LLMProvider {
 
     return {
       actions,
+      toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
       rawUsage: {
         prompt: response.usage?.prompt_tokens ?? 0,
         completion: response.usage?.completion_tokens ?? 0,

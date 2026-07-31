@@ -3,6 +3,13 @@ export interface Action {
   toolName?: string;
   parameters?: Record<string, unknown>;
   summary?: string;
+  toolCallId?: string;
+}
+
+export interface ToolCallRecord {
+  id: string;
+  name: string;
+  arguments: string;
 }
 
 export interface ToolResult {
@@ -28,11 +35,13 @@ export interface Message {
   role: "system" | "user" | "assistant" | "tool";
   content: string;
   toolCallId?: string;
+  toolCalls?: ToolCallRecord[];
 }
 
 export interface LLMResponse {
   actions: Action[];
   rawUsage: { prompt: number; completion: number };
+  toolCalls?: ToolCallRecord[];
 }
 
 export interface ToolDefinition {
@@ -72,6 +81,8 @@ export interface ConversationTurn {
   content: string;
   timestamp: number;
   tokenCount: number;
+  toolCallId?: string;
+  toolCalls?: ToolCallRecord[];
 }
 
 export interface CompressedSummary {

@@ -49,6 +49,8 @@ export class ConversationManager {
     return this.history.map((t) => ({
       role: t.role,
       content: t.content,
+      ...(t.toolCallId ? { toolCallId: t.toolCallId } : {}),
+      ...(t.toolCalls ? { toolCalls: t.toolCalls } : {}),
     }));
   }
 }

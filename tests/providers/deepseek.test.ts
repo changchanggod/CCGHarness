@@ -81,6 +81,7 @@ describe("DeepSeekProvider", () => {
       type: "tool_call",
       toolName: "read_file",
       parameters: { path: "/src/main.ts" },
+      toolCallId: "call_1",
     });
     expect(result.rawUsage).toEqual({ prompt: 40, completion: 25 });
   });

@@ -60,6 +60,7 @@ describe("AnthropicProvider", () => {
       type: "tool_call",
       toolName: "read_file",
       parameters: { path: "/src/index.ts" },
+      toolCallId: "toolu_01A",
     });
     expect(result.rawUsage).toEqual({ prompt: 50, completion: 30 });
   });

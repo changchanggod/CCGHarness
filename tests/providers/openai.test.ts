@@ -70,6 +70,7 @@ describe("OpenAIProvider", () => {
       type: "tool_call",
       toolName: "read_file",
       parameters: { path: "/src/index.ts" },
+      toolCallId: "call_1",
     });
     expect(result.rawUsage).toEqual({ prompt: 50, completion: 30 });
   });

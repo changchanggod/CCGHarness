@@ -1,5 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import type { Message, LLMResponse, ToolDefinition, Action } from "../core/types.js";
+import type { Message, LLMResponse, ToolDefinition, Action, ToolCallRecord } from "../core/types.js";
 import type { LLMProvider } from "./interface.js";
 
 export interface AnthropicConfig {
@@ -48,6 +48,7 @@ export class AnthropicProvider implements LLMProvider {
     });
 
     const actions: Action[] = [];
+    const toolCalls: ToolCallRecord[] = [];
 
     for (const block of response.content) {
       if (block.type === "tool_use") {
@@ -55,6 +56,12 @@ export class AnthropicProvider implements LLMProvider {
           type: "tool_call",
           toolName: block.name,
           parameters: block.input as Record<string, unknown>,
+          toolCallId: block.id,
+        });
+        toolCalls.push({
+          id: block.id,
+          name: block.name,
+          arguments: JSON.stringify(block.input),
         });
       }
     }
@@ -72,6 +79,7 @@ export class AnthropicProvider implements LLMProvider {
 
     return {
       actions,
+      toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
       rawUsage: {
         prompt: response.usage.input_tokens,
         completion: response.usage.output_tokens,
