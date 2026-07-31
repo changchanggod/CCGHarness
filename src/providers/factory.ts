@@ -4,11 +4,13 @@ import { OpenAIProvider } from "./openai.js";
 import { AnthropicProvider } from "./anthropic.js";
 import { OllamaProvider } from "./ollama.js";
 import { MockLLMProvider } from "./mock.js";
+import { DeepSeekProvider } from "./deepseek.js";
 
 export type LLMConfig =
   | { provider: "openai"; apiKey: string; model: string; baseURL?: string }
   | { provider: "anthropic"; apiKey: string; model: string }
   | { provider: "ollama"; baseURL: string; model: string }
+  | { provider: "deepseek"; apiKey: string; model?: string }
   | { provider: "mock"; responses: LLMResponse[] };
 
 export function createProvider(config: LLMConfig): LLMProvider {
@@ -19,6 +21,8 @@ export function createProvider(config: LLMConfig): LLMProvider {
       return new AnthropicProvider({ apiKey: config.apiKey, model: config.model });
     case "ollama":
       return new OllamaProvider({ baseURL: config.baseURL, model: config.model });
+    case "deepseek":
+      return new DeepSeekProvider({ apiKey: config.apiKey, model: config.model });
     case "mock":
       return new MockLLMProvider(config.responses);
     default: {

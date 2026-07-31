@@ -3,6 +3,7 @@ import { createProvider, type LLMConfig } from "../../src/providers/factory.js";
 import { OpenAIProvider } from "../../src/providers/openai.js";
 import { AnthropicProvider } from "../../src/providers/anthropic.js";
 import { OllamaProvider } from "../../src/providers/ollama.js";
+import { DeepSeekProvider } from "../../src/providers/deepseek.js";
 import { MockLLMProvider } from "../../src/providers/mock.js";
 import type { LLMResponse } from "../../src/core/types.js";
 
@@ -42,6 +43,16 @@ describe("createProvider", () => {
     };
     const provider = createProvider(config);
     expect(provider).toBeInstanceOf(OllamaProvider);
+  });
+
+  it("creates DeepSeekProvider for deepseek config", () => {
+    const config: LLMConfig = {
+      provider: "deepseek",
+      apiKey: "sk-test",
+      model: "deepseek-chat",
+    };
+    const provider = createProvider(config);
+    expect(provider).toBeInstanceOf(DeepSeekProvider);
   });
 
   it("creates MockLLMProvider for mock config", () => {

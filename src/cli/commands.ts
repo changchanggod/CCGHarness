@@ -106,6 +106,8 @@ export async function runTask(
           return { provider, apiKey, model: config.llm.model };
         case "ollama":
           return { provider, baseURL: "http://localhost:11434", model: config.llm.model };
+        case "deepseek":
+          return { provider, apiKey, model: config.llm.model };
         default:
           throw new Error(`Unsupported provider: ${provider}`);
       }

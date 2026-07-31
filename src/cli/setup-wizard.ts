@@ -1,7 +1,7 @@
 import * as readline from "node:readline";
 import { storeApiKey, removeApiKey, checkApiKey } from "./setup.js";
 
-const SUPPORTED_PROVIDERS = ["openai", "anthropic", "ollama"];
+const SUPPORTED_PROVIDERS = ["openai", "anthropic", "ollama", "deepseek"];
 
 function askQuestion(rl: readline.Interface, question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -17,7 +17,7 @@ export async function setupWizard(): Promise<void> {
 
   console.log("=== CCG Credential Setup ===\n");
   console.log("Credentials are stored encrypted in your user home directory.");
-  console.log("Supported providers: openai, anthropic, ollama\n");
+  console.log("Supported providers: openai, anthropic, ollama, deepseek\n");
 
   for (const provider of SUPPORTED_PROVIDERS) {
     const hasKey = await checkApiKey(provider);
@@ -36,7 +36,7 @@ export async function setupWizard(): Promise<void> {
     }
 
     if (trimmed === "s" || trimmed === "set") {
-      const provider = await askQuestion(rl, "Provider (openai/anthropic/ollama): ");
+      const provider = await askQuestion(rl, "Provider (openai/anthropic/ollama/deepseek): ");
       const trimmedProvider = provider.trim().toLowerCase();
 
       if (!SUPPORTED_PROVIDERS.includes(trimmedProvider)) {
@@ -55,7 +55,7 @@ export async function setupWizard(): Promise<void> {
       await storeApiKey(trimmedProvider, trimmedKey);
       console.log(`API key stored for ${trimmedProvider}.\n`);
     } else if (trimmed === "r" || trimmed === "remove") {
-      const provider = await askQuestion(rl, "Provider (openai/anthropic/ollama): ");
+      const provider = await askQuestion(rl, "Provider (openai/anthropic/ollama/deepseek): ");
       const trimmedProvider = provider.trim().toLowerCase();
 
       if (!SUPPORTED_PROVIDERS.includes(trimmedProvider)) {
