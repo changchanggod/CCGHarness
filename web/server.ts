@@ -3,6 +3,7 @@ import path from "node:path";
 import fs from "node:fs";
 import type { Server } from "node:http";
 import { createConfigRouter } from "./routes.js";
+import { attachWebSocket } from "./ws-handler.js";
 
 export function startServer(port: number): Promise<Server> {
   return new Promise((resolve) => {
@@ -19,6 +20,7 @@ export function startServer(port: number): Promise<Server> {
     const server = app.listen(port, () => {
       resolve(server);
     });
+    attachWebSocket(server);
   });
 }
 
