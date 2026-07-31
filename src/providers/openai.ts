@@ -1,3 +1,5 @@
+delete process.env.DEBUG;
+
 import OpenAI from "openai";
 import type { Message, LLMResponse, ToolDefinition, Action, ToolCallRecord } from "../core/types.js";
 import type { LLMProvider } from "./interface.js";
@@ -13,9 +15,6 @@ export class OpenAIProvider implements LLMProvider {
   private model: string;
 
   constructor(config: OpenAIConfig) {
-    if (process.env.DEBUG === "true") {
-      process.env.DEBUG = "false";
-    }
     this.client = new OpenAI({
       apiKey: config.apiKey,
       baseURL: config.baseURL,
