@@ -1,25 +1,28 @@
 {
   "name": "ccg",
   "type": "module",
-  "bin": {
-    "ccg": "dist/cli/index.js"
+  "bin": "dist/src/cli/index.js",
+  "pkg": {
+    "assets": [
+      "node_modules/**/*"
+    ],
+    "outputPath": "."
   },
   "dependencies": {
-    "openai": "^4",
     "@anthropic-ai/sdk": "^0.30",
+    "commander": "^12",
     "js-yaml": "^4.1",
-    "commander": "^12"
+    "openai": "^4"
   },
   "devDependencies": {
-    "typescript": "^5.5",
-    "vitest": "^2",
-    "@types/node": "^20",
     "@types/js-yaml": "^4",
-    "postject": "^1.0.0-alpha.6"
+    "@types/node": "^20",
+    "pkg": "^5.8.1",
+    "typescript": "^5.5",
+    "vitest": "^2"
   },
   "scripts": {
     "build": "tsc",
-    "build:binary": "node --experimental-sea-config sea-config.json",
     "build:sea": "node scripts/build-binary.js",
     "test": "vitest run",
     "test:watch": "vitest",
