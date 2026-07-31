@@ -17,11 +17,11 @@ exec("npm run build");
 const plat = platform();
 const cpuArch = arch();
 const targetMap = {
-  win32: { x64: "node20-win-x64" },
-  darwin: { x64: "node20-macos-x64", arm64: "node20-macos-arm64" },
-  linux: { x64: "node20-linux-x64", arm64: "node20-linux-arm64" },
+  win32: { x64: "node18-win-x64" },
+  darwin: { x64: "node18-macos-x64", arm64: "node18-macos-arm64" },
+  linux: { x64: "node18-linux-x64", arm64: "node18-linux-arm64" },
 };
-const target = targetMap[plat]?.[cpuArch] ?? "node20-win-x64";
+const target = targetMap[plat]?.[cpuArch] ?? "node18-win-x64";
 const outName = plat === "win32" ? "ccg.exe" : "ccg";
 
 console.log(`Packaging with pkg (target: ${target})...`);
