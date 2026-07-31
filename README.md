@@ -304,8 +304,6 @@ CCGHarness/
 ├── guardrails.example.yaml# 示例守护规则
 ├── SPEC.md                # 设计文档
 ├── PLAN.md                # 实现计划
-├── AGENT_LOG.md           # Agent 交互日志
-├── SPEC_PROCESS.md        # 过程文档
 └── .github/workflows/     # CI 配置（unit-test 任务）
 ```
 
