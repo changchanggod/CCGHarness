@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as readline from "node:readline";
 import * as path from "node:path";
+import * as os from "node:os";
 import yaml from "js-yaml";
 import type { LLMProvider } from "../providers/interface.js";
 import type { GuardrailRule, ToolDefinition } from "../core/types.js";
@@ -133,13 +134,21 @@ export async function runTask(
     onApprovalRequired: createHITLHandler(verbose),
   });
 
+  const platform = os.platform();
+  const platformHint = platform === "win32"
+    ? `You are running on Windows. Use Windows commands (dir, findstr, type, del, etc.), not Unix commands (ls, grep, cat, rm). Use 'cmd /c' prefix for shell commands when needed.`
+    : `You are running on ${platform}. Use standard Unix/Linux commands.`;
+
+  const toolNames = tools.map((t) => t.name).join(", ");
+  const toolHint = `Available tools: ${toolNames}. Use only these tools.`;
+
   const loop = new AgentLoop({
     provider,
     guard,
     tools,
     maxRounds: config.llm.maxRounds,
     maxConsecutiveFailures: 3,
-    systemPrompt: "You are a coding agent. Complete the user's task using the available tools.",
+    systemPrompt: `You are a coding agent. Complete the user's task using the available tools.\n${platformHint}\n${toolHint}`,
     projectContext: "",
   });
 

@@ -86,6 +86,7 @@ export class AgentLoop {
               content: `Guard blocked action: ${guardResult.reason}`,
               timestamp: Date.now(),
               tokenCount: 30,
+              ...(action.toolCallId ? { toolCallId: action.toolCallId } : {}),
             });
             if (this.consecutiveFailures >= this.config.maxConsecutiveFailures) {
               this.finished = true;
@@ -105,6 +106,7 @@ export class AgentLoop {
               content: `Tool not found: ${toolName}`,
               timestamp: Date.now(),
               tokenCount: 20,
+              ...(action.toolCallId ? { toolCallId: action.toolCallId } : {}),
             });
             if (this.consecutiveFailures >= this.config.maxConsecutiveFailures) {
               this.finished = true;
