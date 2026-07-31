@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, rmSync, createWriteStream } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, rmSync, createWriteStream, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { platform, arch } from "node:os";
@@ -30,6 +30,15 @@ const download = (url, dest) => new Promise((resolve, reject) => {
 
 console.log("Building TypeScript...");
 exec("npm run build");
+
+console.log("Creating CJS SEA entry point...");
+writeFileSync(resolve(root, "dist", "sea-entry.cjs"), `"use strict";
+// Node.js SEA entry point - CJS wrapper that loads ESM module via dynamic import
+import("./src/cli/index.js").then(() => {}).catch((err) => {
+  console.error("Fatal:", err);
+  process.exit(1);
+});
+`);
 
 console.log("Generating SEA blob...");
 exec("node --experimental-sea-config sea-config.json");
