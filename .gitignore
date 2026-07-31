@@ -8,3 +8,5 @@ dist/
 sea-prep.blob
 ccg.exe
 ccg
+ccg.yaml
+guardrails.yaml
