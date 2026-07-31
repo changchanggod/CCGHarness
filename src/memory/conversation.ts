@@ -37,8 +37,8 @@ export class ConversationManager {
     const half = Math.ceil(n / 2);
     const remaining = this.history.slice(half);
     const summaryTurn: ConversationTurn = {
-      role: "system",
-      content: summary,
+      role: "user",
+      content: `[Conversation summary] ${summary}`,
       timestamp: Date.now(),
       tokenCount: summary.length,
     };

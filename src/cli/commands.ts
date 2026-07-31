@@ -19,6 +19,8 @@ import { GuardOrchestrator } from "../governance/guard.js";
 import type { ApprovalRequest, ApprovalDecision } from "../governance/approval-fsm.js";
 import { AgentLoop } from "../core/loop.js";
 
+const PROVIDERS_WITHOUT_KEY = new Set(["ollama"]);
+
 function loadGuardrailRules(rulesFile: string): GuardrailRule[] {
   if (!fs.existsSync(rulesFile)) {
     return [];
@@ -47,8 +49,9 @@ function createTools(config: AppConfig): ToolDefinition[] {
 
 function createHITLHandler(
   verbose: boolean,
+  sharedRl?: readline.Interface,
 ): (request: ApprovalRequest) => Promise<ApprovalDecision> {
-  const rl = readline.createInterface({
+  const rl = sharedRl ?? readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
@@ -79,11 +82,19 @@ function createHITLHandler(
   };
 }
 
+const PROVIDER_MODEL_DEFAULTS: Record<string, string> = {
+  openai: "gpt-4o",
+  anthropic: "claude-sonnet-4-20250514",
+  deepseek: "deepseek-chat",
+  ollama: "llama3",
+};
+
 export async function runTask(
   task: string,
   configPath: string,
   verbose: boolean = false,
   injectProvider?: LLMProvider,
+  sharedRl?: readline.Interface,
 ): Promise<string> {
   const config = loadConfig(configPath);
 
@@ -91,29 +102,35 @@ export async function runTask(
   if (injectProvider) {
     provider = injectProvider;
   } else {
-    const apiKey = await getApiKey(config.llm.provider);
-    if (!apiKey) {
-      throw new Error(
-        `No API key found for provider "${config.llm.provider}". Run "ccg setup" to configure.`,
-      );
-    }
+    const providerName = config.llm.provider;
+    const needsKey = !PROVIDERS_WITHOUT_KEY.has(providerName);
 
-    const llmConfig: LLMConfig = (() => {
-      const provider = config.llm.provider;
-      switch (provider) {
-        case "openai":
-          return { provider, apiKey, model: config.llm.model };
-        case "anthropic":
-          return { provider, apiKey, model: config.llm.model };
-        case "ollama":
-          return { provider, baseURL: "http://localhost:11434", model: config.llm.model };
-        case "deepseek":
-          return { provider, apiKey, model: config.llm.model };
-        default:
-          throw new Error(`Unsupported provider: ${provider}`);
+    if (needsKey) {
+      const apiKey = await getApiKey(providerName);
+      if (!apiKey) {
+        throw new Error(
+          `No API key found for provider "${providerName}". Run "ccg setup" to configure.`,
+        );
       }
-    })();
-    provider = createProvider(llmConfig);
+
+      const model = config.llm.model || PROVIDER_MODEL_DEFAULTS[providerName] || "gpt-4o";
+      const llmConfig: LLMConfig = (() => {
+        switch (providerName) {
+          case "openai":
+            return { provider: providerName, apiKey, model };
+          case "anthropic":
+            return { provider: providerName, apiKey, model };
+          case "deepseek":
+            return { provider: providerName, apiKey, model };
+          default:
+            throw new Error(`Unsupported provider: ${providerName}`);
+        }
+      })();
+      provider = createProvider(llmConfig);
+    } else {
+      const model = config.llm.model || PROVIDER_MODEL_DEFAULTS[providerName] || "llama3";
+      provider = createProvider({ provider: providerName as "ollama", baseURL: "http://localhost:11434", model });
+    }
   }
 
   const rulesFile = path.resolve(path.dirname(configPath), config.guardrails.rulesFile);
@@ -131,7 +148,7 @@ export async function runTask(
     },
     hitlEnabled: config.guardrails.hitlEnabled,
     hitlTimeout: config.guardrails.hitlTimeout,
-    onApprovalRequired: createHITLHandler(verbose),
+    onApprovalRequired: createHITLHandler(verbose, sharedRl),
   });
 
   const platform = os.platform();

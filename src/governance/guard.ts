@@ -4,6 +4,7 @@ import { scoreRisk } from "./risk-scorer.js";
 import { checkSandbox } from "./sandbox.js";
 import type { SandboxConfig } from "./sandbox.js";
 import type { ApprovalRequest, ApprovalDecision } from "./approval-fsm.js";
+import { ApprovalFSM } from "./approval-fsm.js";
 
 export interface GuardResult {
   allowed: boolean;
@@ -28,9 +29,9 @@ function describeAction(action: Action): string {
     case "shell":
       return `Execute shell command: ${action.parameters?.command ?? ""}`;
     case "write_file":
-      return `Write file: ${action.parameters?.filePath ?? ""}`;
+      return `Write file: ${action.parameters?.path ?? ""}`;
     case "read_file":
-      return `Read file: ${action.parameters?.filePath ?? ""}`;
+      return `Read file: ${action.parameters?.path ?? ""}`;
     case "run_tests":
       return "Run tests";
     case "run_lint":
@@ -42,9 +43,11 @@ function describeAction(action: Action): string {
 
 export class GuardOrchestrator {
   private config: GuardOrchestratorConfig;
+  private fsm: ApprovalFSM;
 
   constructor(config: GuardOrchestratorConfig) {
     this.config = config;
+    this.fsm = new ApprovalFSM({ timeoutMs: config.hitlTimeout * 1000 });
   }
 
   async guard(action: Action): Promise<GuardResult> {
@@ -61,36 +64,70 @@ export class GuardOrchestrator {
     }
 
     if (scored.riskLevel === "warn" && this.config.hitlEnabled) {
-      const decision = await this.config.onApprovalRequired({
+      const request: ApprovalRequest = {
         actionDescription: describeAction(action),
         riskLevel: scored.riskLevel,
         matchedRules: scored.matchedRules,
-      });
+      };
 
-      if (decision === "deny") {
+      this.fsm.requestApproval(request);
+
+      if (this.fsm.getState() === "approved") {
+        this.fsm.reset();
+        return this.getSandboxResult(action, scored.riskLevel, scored.matchedRules);
+      }
+
+      if (this.fsm.getState() === "timeout") {
+        this.fsm.reset();
         return {
           allowed: false,
           riskLevel: "warn",
-          reason: "Action denied by user",
+          reason: "HITL approval timed out",
           matchedRules: scored.matchedRules,
         };
       }
+
+      const decision = await this.config.onApprovalRequired(request);
+
+      if (decision === "approve_all") {
+        this.fsm.approveAll();
+      } else {
+        this.fsm.submitDecision(decision);
+      }
+
+      const state = this.fsm.getState();
+
+      if (state === "denied" || state === "timeout") {
+        this.fsm.reset();
+        return {
+          allowed: false,
+          riskLevel: "warn",
+          reason: state === "timeout" ? "HITL approval timed out" : "Action denied by user",
+          matchedRules: scored.matchedRules,
+        };
+      }
+
+      this.fsm.reset();
     }
 
+    return this.getSandboxResult(action, scored.riskLevel, scored.matchedRules);
+  }
+
+  private getSandboxResult(action: Action, riskLevel: string, matchedRules: string[]): GuardResult {
     const sandboxResult = checkSandbox(action, this.config.sandboxConfig);
     if (!sandboxResult.allowed) {
       return {
         allowed: false,
-        riskLevel: scored.riskLevel,
+        riskLevel,
         reason: sandboxResult.reason,
-        matchedRules: scored.matchedRules,
+        matchedRules,
       };
     }
 
     return {
       allowed: true,
-      riskLevel: scored.riskLevel,
-      matchedRules: scored.matchedRules,
+      riskLevel,
+      matchedRules,
     };
   }
 }

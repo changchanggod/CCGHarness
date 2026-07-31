@@ -99,7 +99,7 @@ async function runInteractive(configPath: string, verbose: boolean): Promise<voi
     }
 
     try {
-      const result = await runTask(trimmed, configPath, verbose);
+      const result = await runTask(trimmed, configPath, verbose, undefined, rl);
       if (!verbose) console.log(`\n${result}\n`);
       else console.log();
     } catch (e: unknown) {

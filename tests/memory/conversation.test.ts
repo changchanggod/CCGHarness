@@ -121,7 +121,7 @@ describe("ConversationManager", () => {
       expect(manager.getHistory()).toEqual([]);
     });
 
-    it("replaces oldest half with a single system turn", () => {
+    it("replaces oldest half with a single user turn", () => {
       const turns = [makeTurn({ content: "1" }), makeTurn({ content: "2" }),
         makeTurn({ content: "3" }), makeTurn({ content: "4" })];
       for (const t of turns) { manager.addTurn(t); }
@@ -130,8 +130,8 @@ describe("ConversationManager", () => {
 
       const history = manager.getHistory();
       expect(history).toHaveLength(3);
-      expect(history[0].role).toBe("system");
-      expect(history[0].content).toBe("Compressed summary");
+      expect(history[0].role).toBe("user");
+      expect(history[0].content).toBe("[Conversation summary] Compressed summary");
       expect(history[0].tokenCount).toBeGreaterThan(0);
       expect(history[0].timestamp).toBeGreaterThan(0);
       expect(history[1]).toBe(turns[2]);
@@ -146,8 +146,8 @@ describe("ConversationManager", () => {
 
       const history = manager.getHistory();
       expect(history).toHaveLength(1);
-      expect(history[0].role).toBe("system");
-      expect(history[0].content).toBe("summary");
+      expect(history[0].role).toBe("user");
+      expect(history[0].content).toBe("[Conversation summary] summary");
     });
   });
 
