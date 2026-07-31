@@ -4,7 +4,7 @@ import * as path from "node:path";
 import * as os from "node:os";
 import yaml from "js-yaml";
 import type { LLMProvider } from "../providers/interface.js";
-import type { GuardrailRule, ToolDefinition, ToolResult } from "../core/types.js";
+import type { GuardrailRule, ToolDefinition } from "../core/types.js";
 import type { AppConfig } from "../config/loader.js";
 import { loadConfig } from "../config/loader.js";
 import { getApiKey } from "./setup.js";

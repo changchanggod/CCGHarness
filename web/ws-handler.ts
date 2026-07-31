@@ -25,6 +25,13 @@ export function attachWebSocket(server: Server): void {
   wss.on("connection", (ws) => {
     let hitlResolve: ((decision: ApprovalDecision) => void) | null = null;
 
+    ws.on("close", () => {
+      if (hitlResolve) {
+        hitlResolve("deny");
+        hitlResolve = null;
+      }
+    });
+
     ws.on("message", async (raw) => {
       let msg: ClientMessage;
       try {
