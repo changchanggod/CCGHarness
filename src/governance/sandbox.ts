@@ -21,9 +21,9 @@ export function checkSandbox(action: Action, config: SandboxConfig): SandboxResu
   const toolName = action.toolName;
 
   if (toolName === "write_file") {
-    const filePath = typeof action.parameters?.filePath === "string" ? action.parameters.filePath : "";
+    const filePath = typeof action.parameters?.path === "string" ? action.parameters.path : "";
     if (!filePath) {
-      return { allowed: false, reason: "write_file requires a filePath parameter" };
+      return { allowed: false, reason: "write_file requires a path parameter" };
     }
     const resolved = path.resolve(filePath);
     const resolvedWorkspace = path.resolve(config.workspace);

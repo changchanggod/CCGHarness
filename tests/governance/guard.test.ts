@@ -83,7 +83,7 @@ describe("GuardOrchestrator", () => {
   describe("sandbox", () => {
     it("rejects a sandbox violation", async () => {
       const orchestrator = makeOrchestrator();
-      const result = await orchestrator.guard(act("write_file", { filePath: "/etc/passwd", content: "x" }));
+      const result = await orchestrator.guard(act("write_file", { path: "/etc/passwd", content: "x" }));
       expect(result.allowed).toBe(false);
       expect(result.reason).toBeDefined();
       expect(result.reason).toContain("outside workspace");

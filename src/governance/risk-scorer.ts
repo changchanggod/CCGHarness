@@ -8,7 +8,7 @@ export function getCommandString(action: Action): string {
     case "shell":
       return typeof action.parameters?.command === "string" ? action.parameters.command : "";
     case "write_file":
-      return typeof action.parameters?.filePath === "string" ? action.parameters.filePath : action.toolName;
+      return typeof action.parameters?.path === "string" ? action.parameters.path : action.toolName;
     default:
       return action.toolName;
   }

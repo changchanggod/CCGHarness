@@ -23,12 +23,12 @@ describe("getCommandString", () => {
   });
 
   it("extracts path param for write_file tool", () => {
-    const action = act("write_file", { filePath: "/etc/passwd", content: "x" });
+    const action = act("write_file", { path: "/etc/passwd", content: "x" });
     expect(getCommandString(action)).toBe("/etc/passwd");
   });
 
   it("returns toolName for other tools", () => {
-    const action = act("read_file", { filePath: "foo.txt" });
+    const action = act("read_file", { path: "foo.txt" });
     expect(getCommandString(action)).toBe("read_file");
   });
 

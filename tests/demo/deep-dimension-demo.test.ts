@@ -44,7 +44,7 @@ function makeGuardOrchestrator(overrides: {
 describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers)", () => {
   describe("Layer 1: Classifier", () => {
     it("classifies read_file as file_read", () => {
-      const result = classifyCommand(act("read_file", { filePath: "src/main.ts" }));
+      const result = classifyCommand(act("read_file", { path: "src/main.ts" }));
       expect(result.category).toBe("file_read");
     });
 
@@ -54,7 +54,7 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
     });
 
     it("classifies write_file as file_write", () => {
-      const result = classifyCommand(act("write_file", { filePath: "test.txt" }));
+      const result = classifyCommand(act("write_file", { path: "test.txt" }));
       expect(result.category).toBe("file_write");
     });
 
@@ -66,8 +66,8 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
 
   describe("Layer 2: Risk Scorer", () => {
     it("safe read_file scores 0 and is safe", () => {
-      const classification = classifyCommand(act("read_file", { filePath: "src/main.ts" }));
-      const result = scoreRisk(act("read_file", { filePath: "src/main.ts" }), classification, governanceRules);
+      const classification = classifyCommand(act("read_file", { path: "src/main.ts" }));
+      const result = scoreRisk(act("read_file", { path: "src/main.ts" }), classification, governanceRules);
       expect(result.riskScore).toBe(0);
       expect(result.riskLevel).toBe("safe");
       expect(result.matchedRules).toEqual([]);
@@ -108,7 +108,7 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
   describe("Layer 3: GuardOrchestrator — action classification", () => {
     it("safe: read_file passes through guard", async () => {
       const guard = makeGuardOrchestrator();
-      const result = await guard.guard(act("read_file", { filePath: "src/main.ts" }));
+      const result = await guard.guard(act("read_file", { path: "src/main.ts" }));
       expect(result.allowed).toBe(true);
       expect(result.riskLevel).toBe("safe");
       expect(result.matchedRules).toEqual([]);
@@ -154,14 +154,14 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
   describe("Layer 4: Sandbox enforcement", () => {
     it("write_file outside workspace is rejected by sandbox", async () => {
       const guard = makeGuardOrchestrator();
-      const result = await guard.guard(act("write_file", { filePath: "/etc/passwd", content: "x" }));
+      const result = await guard.guard(act("write_file", { path: "/etc/passwd", content: "x" }));
       expect(result.allowed).toBe(false);
       expect(result.reason).toContain("outside workspace");
     });
 
     it("write_file inside workspace passes sandbox", async () => {
       const guard = makeGuardOrchestrator();
-      const result = await guard.guard(act("write_file", { filePath: "/tmp/workspace/output.txt" }));
+      const result = await guard.guard(act("write_file", { path: "/tmp/workspace/output.txt" }));
       expect(result.allowed).toBe(true);
     });
 
@@ -191,7 +191,7 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
       const onApprovalRequired = vi.fn(async (_req: ApprovalRequest) => "approve" as const);
       const guard = makeGuardOrchestrator({ onApprovalRequired });
 
-      const safeResult = await guard.guard(act("read_file", { filePath: "README.md" }));
+      const safeResult = await guard.guard(act("read_file", { path: "README.md" }));
       expect(safeResult.allowed).toBe(true);
       expect(safeResult.riskLevel).toBe("safe");
       expect(safeResult.matchedRules).toEqual([]);

@@ -9,11 +9,11 @@ function shellAction(command: string): Action {
 }
 
 function writeFileAction(filePath: string): Action {
-  return { type: "tool_call", toolName: "write_file", parameters: { filePath, content: "test" } };
+  return { type: "tool_call", toolName: "write_file", parameters: { path: filePath, content: "test" } };
 }
 
 function readFileAction(filePath: string): Action {
-  return { type: "tool_call", toolName: "read_file", parameters: { filePath } };
+  return { type: "tool_call", toolName: "read_file", parameters: { path: filePath } };
 }
 
 const workspace = "/home/user/project";
