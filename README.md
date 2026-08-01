@@ -20,6 +20,7 @@ CCGHarness 是 AI4SE 课程项目（Track A: Coding Agent Harness），核心目
 
 - Node.js 18+
 - npm 或 pnpm
+- **最好在 Windows 系统下运行**（Windows 为推荐/首选运行环境）
 
 ### 从源码构建
 
@@ -344,3 +345,4 @@ npx vitest run             # 单次运行
 - Ollama 需要本地运行 Ollama 服务
 - Shell 工具测试使用平台特定命令，跨平台 CI 可能需要适配
 - `.env` 文件支持可用，但标记为明文风险
+- **建议在 Windows 系统下运行**（Windows 为主要开发/测试环境，软性环境要求）
