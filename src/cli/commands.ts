@@ -200,7 +200,7 @@ export async function createAgentLoop(
     guard,
     tools: effectiveTools,
     maxRounds: config.llm.maxRounds,
-    maxConsecutiveFailures: 3,
+    maxConsecutiveFailures: 5,
     systemPrompt: `You are a coding agent. Complete the user's task using the available tools.\n${platformHint}\n${toolHint}`,
     projectContext: "",
   });
