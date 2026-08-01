@@ -18,6 +18,10 @@ function connect(): void {
   const protocol = location.protocol === "https:" ? "wss:" : "ws:";
   ws = new WebSocket(`${protocol}//${location.host}/ws`);
 
+  ws.onopen = () => {
+    loadConfig();
+  };
+
   ws.onmessage = (event) => {
     const msg = JSON.parse(event.data);
     switch (msg.type) {
@@ -150,8 +154,8 @@ document.getElementById("hitlApprove")!.addEventListener("click", () => respondH
 document.getElementById("hitlDeny")!.addEventListener("click", () => respondHITL("deny"));
 document.getElementById("hitlApproveAll")!.addEventListener("click", () => respondHITL("approve_all"));
 
-// Load current config on startup
-(async () => {
+// Load current config on startup and after reconnect
+async function loadConfig(): Promise<void> {
   try {
     const res = await fetch("/api/config");
     if (res.ok) {
@@ -167,6 +171,8 @@ document.getElementById("hitlApproveAll")!.addEventListener("click", () => respo
       }
     }
   } catch {}
-})();
+}
+
+loadConfig();
 
 connect();
