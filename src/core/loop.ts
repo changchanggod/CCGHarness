@@ -34,6 +34,11 @@ export class AgentLoop {
   }
 
   async run(task: string): Promise<string> {
+    this.round = 0;
+    this.consecutiveFailures = 0;
+    this.finished = false;
+    this.finalResult = "";
+
     this.memory.addTurn({
       role: "user",
       content: task,
@@ -41,6 +46,29 @@ export class AgentLoop {
       tokenCount: task.length,
     });
 
+    return this.executeLoop();
+  }
+
+  clearContext(): void {
+    this.memory = new ConversationManager(this.config.maxTokens ?? 100000);
+    this.round = 0;
+    this.consecutiveFailures = 0;
+    this.finished = false;
+    this.finalResult = "";
+  }
+
+  getState(): LoopState {
+    return {
+      round: this.round,
+      consecutiveFailures: this.consecutiveFailures,
+      conversationHistory: this.memory.getHistory(),
+      compressedSummary: null,
+      finished: this.finished,
+      finalResult: this.finalResult,
+    };
+  }
+
+  private async executeLoop(): Promise<string> {
     const threshold = this.config.compressionThreshold ?? 0.8;
 
     while (this.round < this.config.maxRounds && !this.finished) {
@@ -151,17 +179,6 @@ export class AgentLoop {
     }
 
     return this.finalResult;
-  }
-
-  getState(): LoopState {
-    return {
-      round: this.round,
-      consecutiveFailures: this.consecutiveFailures,
-      conversationHistory: this.memory.getHistory(),
-      compressedSummary: null,
-      finished: this.finished,
-      finalResult: this.finalResult,
-    };
   }
 
   private buildMessages(): Message[] {

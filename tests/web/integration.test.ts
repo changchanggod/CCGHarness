@@ -1,17 +1,29 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
 import WebSocket from "ws";
 
 let server: http.Server;
 const PORT = 3096;
+const CONFIG_PATH = path.resolve("ccg.yaml");
+let configBackup: string | null = null;
 
 beforeAll(async () => {
+  if (fs.existsSync(CONFIG_PATH)) {
+    configBackup = fs.readFileSync(CONFIG_PATH, "utf-8");
+  }
   const { startServer } = await import("../../web/server.js");
   server = await startServer(PORT);
 });
 
 afterAll(() => {
   server?.close();
+  if (configBackup !== null) {
+    fs.writeFileSync(CONFIG_PATH, configBackup, "utf-8");
+  } else {
+    try { fs.unlinkSync(CONFIG_PATH); } catch {}
+  }
 });
 
 describe("Web Console Integration", () => {

@@ -87,6 +87,13 @@ taskInput.addEventListener("keydown", (e) => {
         sendTask();
     }
 });
+document.getElementById("newSessionBtn").addEventListener("click", () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "new_session" }));
+        chat.innerHTML = "";
+        appendMsg("New session started.", "tool");
+    }
+});
 togglePanel.addEventListener("click", () => {
     panel.classList.toggle("open");
 });

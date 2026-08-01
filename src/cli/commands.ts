@@ -89,8 +89,7 @@ const PROVIDER_MODEL_DEFAULTS: Record<string, string> = {
   ollama: "llama3",
 };
 
-export async function runTask(
-  task: string,
+export async function createAgentLoop(
   configPath: string,
   verbose: boolean = false,
   injectProvider?: LLMProvider,
@@ -100,7 +99,7 @@ export async function runTask(
     onToolResult?: (toolName: string, success: boolean, output: string) => void;
     onApprovalRequired?: (request: ApprovalRequest) => Promise<ApprovalDecision>;
   },
-): Promise<string> {
+): Promise<AgentLoop> {
   const config = loadConfig(configPath);
 
   let provider: LLMProvider;
@@ -177,7 +176,7 @@ export async function runTask(
   const toolNames = effectiveTools.map((t) => t.name).join(", ");
   const toolHint = `Available tools: ${toolNames}. Use only these tools.`;
 
-  const loop = new AgentLoop({
+  return new AgentLoop({
     provider,
     guard,
     tools: effectiveTools,
@@ -186,6 +185,22 @@ export async function runTask(
     systemPrompt: `You are a coding agent. Complete the user's task using the available tools.\n${platformHint}\n${toolHint}`,
     projectContext: "",
   });
+}
+
+export async function runTask(
+  task: string,
+  configPath: string,
+  verbose: boolean = false,
+  injectProvider?: LLMProvider,
+  sharedRl?: readline.Interface,
+  callbacks?: {
+    onToolStart?: (toolName: string, params: Record<string, unknown>) => void;
+    onToolResult?: (toolName: string, success: boolean, output: string) => void;
+    onApprovalRequired?: (request: ApprovalRequest) => Promise<ApprovalDecision>;
+  },
+): Promise<string> {
+  const loop = await createAgentLoop(configPath, verbose, injectProvider, sharedRl, callbacks);
+  const config = loadConfig(configPath);
 
   if (verbose) {
     console.log(`[CCG] Running task: ${task}`);
@@ -193,7 +208,6 @@ export async function runTask(
     console.log(`[CCG] Max rounds: ${config.llm.maxRounds}`);
     console.log(`[CCG] Tools: ${config.tools.enabled.join(", ")}`);
     console.log(`[CCG] HITL: ${config.guardrails.hitlEnabled ? "enabled" : "disabled"}`);
-    console.log(`[CCG] Guardrail rules: ${rules.length}`);
   }
 
   const result = await loop.run(task);
