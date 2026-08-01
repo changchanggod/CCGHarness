@@ -94,7 +94,16 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
 }
 
 export function loadConfig(filePath: string): AppConfig {
-  const raw = fs.readFileSync(filePath, "utf-8");
+  let raw: string;
+  try {
+    raw = fs.readFileSync(filePath, "utf-8");
+  } catch (e: unknown) {
+    const err = e as NodeJS.ErrnoException;
+    if (err.code === "ENOENT") {
+      return JSON.parse(JSON.stringify(DEFAULTS)) as AppConfig;
+    }
+    throw e;
+  }
   const parsed = yaml.load(raw);
   const mapped = mapKeys(parsed ?? {}) as Record<string, unknown>;
   const config = JSON.parse(JSON.stringify(DEFAULTS)) as AppConfig;

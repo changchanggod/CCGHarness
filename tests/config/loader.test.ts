@@ -11,8 +11,10 @@ function writeTempYaml(content: string): string {
 }
 
 describe("loadConfig", () => {
-  it("throws when file does not exist", () => {
-    expect(() => loadConfig("/nonexistent/path/config.yaml")).toThrow();
+  it("returns defaults when file does not exist", () => {
+    const config = loadConfig("/nonexistent/path/config.yaml");
+    expect(config.llm.provider).toBe("openai");
+    expect(config.llm.model).toBe("gpt-4o");
   });
 
   it("returns defaults for an empty YAML file", () => {
