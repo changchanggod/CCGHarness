@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCG Web Console</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>CCG Web Console</h1>
+    <button id="togglePanel">设置</button>
+  </header>
+  <main>
+    <div id="chat"></div>
+    <aside id="panel">
+      <label for="provider">Provider</label>
+      <select id="provider">
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="ollama">Ollama</option>
+      </select>
+      <label for="model">Model</label>
+      <input id="model" type="text" placeholder="e.g. deepseek-chat">
+      <button id="saveConfig">保存配置</button>
+    </aside>
+  </main>
+  <footer>
+    <input id="taskInput" type="text" placeholder="输入任务描述，Enter 发送...">
+    <button id="sendBtn">发送</button>
+  </footer>
+  <div id="hitlModal" class="modal">
+    <div class="modal-box">
+      <h3>HITL 审批</h3>
+      <p id="hitlAction"></p>
+      <p id="hitlRisk"></p>
+      <div class="modal-buttons">
+        <button class="approve" id="hitlApprove">批准</button>
+        <button class="deny" id="hitlDeny">拒绝</button>
+        <button class="approve-all" id="hitlApproveAll">全部批准</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

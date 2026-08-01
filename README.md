@@ -78,6 +78,18 @@ ccg --interactive
 | `/h` 或 `/help` | 显示帮助 |
 | `/q` 或 `/quit` | 退出 |
 
+### Web Console
+
+```bash
+npm run start:web
+```
+
+Open `http://localhost:3000` in your browser. Features:
+- Chat interface for task execution
+- Real-time tool execution feedback
+- Provider and model switching via settings panel
+- HITL approval via modal dialog
+
 ## 机制解释
 
 ### 整体架构
