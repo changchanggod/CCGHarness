@@ -337,6 +337,16 @@ npx vitest run             # 单次运行
 - **六维度全覆盖**：Decision（决策）、Tools（工具）、Memory（记忆）、Governance（治理）、Feedback（反馈）、Configuration（配置）均有最小可运行实现
 - **深度维度**：Governance（治理）作为主贡献方向，实现了四层管道 + HITL 状态机 + 审批流程
 
+## 云部署
+
+CCGHarness 通过 [Railway](https://railway.app) 部署了 Web 控制台。
+
+- **公网地址**：[ccgharness-production.up.railway.app](https://ccgharness-production.up.railway.app)
+- **部署平台**：Railway（Node.js 运行时，自动从 `package.json` 检测启动命令）
+- **CI/CD**：关联 GitHub 仓库，`main` 分支推送后自动触发构建和部署
+
+> **注意**：Railway 运行于 Linux 环境，部分功能可能存在兼容性问题（如 Shell 工具的平台差异）。建议优先使用二进制文件在本地 Windows 环境运行，以获得完整的工具执行体验。
+
 ## 已知限制
 
 - 需要 Node.js 18+
