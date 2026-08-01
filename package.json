@@ -25,7 +25,8 @@
     "vitest": "^2"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run build:web",
+    "start": "node dist-web/web/server.js",
     "build:sea": "node scripts/build-binary.js",
     "test": "vitest run",
     "test:watch": "vitest",

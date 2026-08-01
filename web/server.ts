@@ -5,8 +5,7 @@ import type { Server } from "node:http";
 import { createConfigRouter } from "./routes.js";
 import { attachWebSocket } from "./ws-handler.js";
 
-export function startServer(port: number): Promise<Server> {
-  return new Promise((resolve) => {
+export function createApp(): express.Express {
     const app = express();
     app.use(express.json());
     app.use(createConfigRouter());
@@ -17,15 +16,22 @@ export function startServer(port: number): Promise<Server> {
     }
     app.use(express.static(publicDir));
 
-    const server = app.listen(port, () => {
-      resolve(server);
+    return app;
+  }
+
+  export function startServer(port: number): Promise<Server> {
+    return new Promise((resolve) => {
+      const app = createApp();
+      const server = app.listen(port, () => {
+        resolve(server);
+      });
+      attachWebSocket(server);
     });
-    attachWebSocket(server);
-  });
-}
+  }
 
 if (require.main === module) {
-  startServer(3000).then(() => {
-    console.log("CCG Web Console running at http://localhost:3000");
+  const port = parseInt(process.env.PORT || "3000", 10);
+  startServer(port).then(() => {
+    console.log(`CCG Web Console running at http://localhost:${port}`);
   });
 }
