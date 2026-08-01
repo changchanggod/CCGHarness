@@ -55,7 +55,7 @@ const DEFAULTS: AppConfig = {
     autoLint: true,
     autoTest: true,
     testCommand: "npm test",
-    lintCommand: "npm run lint",
+    lintCommand: "npm run typecheck",
   },
 };
 

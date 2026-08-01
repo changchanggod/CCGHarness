@@ -54,7 +54,7 @@ feedback:
   auto_lint: false
   auto_test: false
   test_command: "npm test"
-  lint_command: "npm run lint"
+  lint_command: "npm run typecheck"
 `;
     fs.writeFileSync(configPath, configContent);
 

@@ -34,7 +34,7 @@ describe("loadConfig", () => {
       expect(config.feedback.autoLint).toBe(true);
       expect(config.feedback.autoTest).toBe(true);
       expect(config.feedback.testCommand).toBe("npm test");
-      expect(config.feedback.lintCommand).toBe("npm run lint");
+      expect(config.feedback.lintCommand).toBe("npm run typecheck");
     } finally {
       fs.unlinkSync(filePath);
     }
@@ -118,7 +118,7 @@ tools:
         sandbox: { workspace: ".", allowedCommands: [], blockedCommands: [], allowNetwork: false },
       },
       tools: { enabled: ["read_file", "write_file", "shell", "run_tests", "run_lint"] },
-      feedback: { autoLint: true, autoTest: true, testCommand: "npm test", lintCommand: "npm run lint" },
+      feedback: { autoLint: true, autoTest: true, testCommand: "npm test", lintCommand: "npm run typecheck" },
     };
     expect(config.llm.provider).toBe("openai");
   });
