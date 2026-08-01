@@ -269,15 +269,123 @@
 
 ---
 
-## 总结
+## 2026-07-31 22:00 — Web Console: 设计与规划
+
+**技能**: brainstorming → writing-plans
+**操作**: 为 CCGHarness 设计 Web 控制台（浏览器端 Chat UI，Express + WebSocket 后端，原生 HTML/CSS/TS 前端）。产出设计文档和 9-task 实现计划。
+**产物**: `docs/superpowers/specs/2026-07-31-web-console-design.md`, `docs/superpowers/plans/2026-07-31-web-console.md`
+**分支**: `feature/web-console`
+
+---
+
+## 2026-07-31 22:30 — Web Console Task 1: 项目搭建
+
+**Subagent**: `ses_0474964a6ffeILC799Mlv3dq8h` (general)
+**Commit**: `4b7213b` — `chore: add web project setup with express, ws, tsconfig`
+**技能**: subagent-driven-development, TDD
+
+---
+
+## 2026-07-31 22:45 — Web Console Task 2: Express Server
+
+**Subagent**: `ses_0474405b3ffejhUDuvrenjRh0A` (general)
+**Commit**: `b4b0cda` — `feat: add Express server with static file serving`
+**Test**: 2/2 (server.test.ts)
+
+---
+
+## 2026-07-31 22:55 — Web Console Task 3: REST Config Endpoints
+
+**Subagent**: `ses_0473d9350ffeWag6hZ7hOT1En7` (general)
+**Commit**: `c5e97b8` — `feat: add REST config endpoints for provider and model`
+**Test**: 3/3 (routes.test.ts), 240 total
+
+---
+
+## 2026-07-31 23:05 — Web Console Task 4: runTask Callbacks
+
+**Subagent**: `ses_047391bb5ffe7VqbowxwCIkmXH` (general)
+**Commit**: `af44efe` — `feat: add optional callbacks to runTask for tool execution and HITL events`
+**内容**: 向 `runTask()` 添加 `callbacks` 参数（onToolStart / onToolResult / onApprovalRequired），Web 后端通过回调推送实时状态到 WebSocket。
+**Test**: 1 new test, 241 total
+
+---
+
+## 2026-07-31 23:10 — Web Console Task 5: WebSocket Handler
+
+**Subagent**: `ses_047346fd6ffe6yqctec9YbsM2r` (general)
+**Commit**: `8b6632a` — `feat: add WebSocket handler with harness bridge`
+**Test**: 2/2 (ws-handler.test.ts), 243 total
+
+---
+
+## 2026-07-31 23:25 — Web Console Task 6-7: Frontend
+
+**Subagent**: `ses_0472e362cffe0l7AIf7XAg733f` (general) + `ses_0472acd34ffeU73eccMN8cCL2M` (general)
+**Commit**: `de24094` (HTML+CSS), `1750d16` (TypeScript + WebSocket chat)
+**内容**: 深色主题三段式布局（chat / config panel / input）、WebSocket 实时消息、HITL 弹窗审批、provider/model 设置面板
+**Test**: 247 total
+
+---
+
+## 2026-08-01 10:00 — 运行期 Bug 修复 (Round 1)
+
+**技能**: systematic-debugging
+**内容**:
+- `462a21b`: HITL 并发死锁（单变量 → 队列）、POST body 空检查、config 加载 ok 检查、output undefined 保护
+- `82e9eca`: 编译问题修复
+- `b4986c9`: HITL 断线清理 + 移除未用 import
+**人工干预**: 用户发现前端配置丢失、Agent context 问题
+
+---
+
+## 2026-08-01 11:00 — Vercel 部署尝试 (已放弃) → Railway 迁移
+
+**操作**: 创建 `vercel.json`、`api/index.js`（Vercel serverless 入口）
+**Commit**: `419e08b`
+**决策**: Vercel 不支持 WebSocket，放弃。改用 Railway。
+**Railway 修复**:
+- `d58e3c9`: 添加 `start` 脚本、PORT 环境变量
+- `6f80fe1`: `copy` → `node -e "fs.cpSync(...)"` 跨平台
+- `9483e13`: API Key 输入框（前端设置面板）
+
+---
+
+## 2026-08-01 12:00 — Interactive Session Context
+
+**技能**: subagent-driven-development
+**Commit**: `e7e6aba` — `feat: add interactive session context with new-session support`
+**内容**: `AgentLoop` 添加 `clearContext()`、`executeLoop()`；WebSocket 每个连接维持持久 loop；前端"新对话"按钮
+**人工干预**: 用户反馈 Web 端上下文丢失（每任务新建 AgentLoop）
+
+---
+
+## 2026-08-01 13:00 — Bug 修复 (Round 2)
+
+**内容**:
+- `9e2d49c`: `filePath` → `path` 统一（sandbox + risk-scorer 与 write_file schema 冲突）
+- `ab40bf7`: WebSocket 重连后重新拉取配置（前端 `ws.onopen` 中调用 `loadConfig()`）
+- `df4561b`: config 未配 key 的 provider 时自动回退到已配 key 的 provider
+- `f3dcdf8`: `ccg.yaml` 不存在时回退到内置默认值
+- `df561a3`: `maxConsecutiveFailures` 3→5
+- `b84818b`: 默认 lint 命令 `npm run lint` → `npm run typecheck`
+
+---
+
+## 2026-08-01 14:00 — CI 修复 + README 云部署
+
+**Commit**: `87715b7` (CI 真实测试 + 二进制构建), `a0c7d69` (build-binary.js→.mjs), `43a54d3` (README 云部署章节)
+**内容**: CI `unit-test` job 从占位 `echo hello` 改为真实 `npm test`；新增 `build-binary` job；README 添加 Railway 公网地址和部署说明
+
+---
+
+## 总结（更新）
 
 | 指标 | 数值 |
 |------|------|
-| 总 task 数 | 26 |
-| 总 subagent 派发 | 24 次实现 + 18 次评审 |
-| 总 commit | 30+ |
-| 最终测试数 | 192+ (含 demo: 219+) |
-| Fix round | 1 次 (Task 1 .gitignore) |
-| 人工干预 | tsconfig 修复、commit 拆分 |
-| 待处理 deferred | 9 个 minor/important 项 |
-| 关键未决 | block 级别 HITL (plan vs spec) |
+| 总 task 数 | 26 (core) + 9 (web) = 35 |
+| 总 commit | 150+ |
+| 最终测试数 | 247 |
+| Web 部署 | Railway (ccgharness-production.up.railway.app) |
+| CI | unit-test + build-binary |
+| 待处理 deferred | 5 个 minor（YAML 格式化、tsconfig kludge、onerror、重连循环、测试隔离）
