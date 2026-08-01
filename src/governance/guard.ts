@@ -89,11 +89,31 @@ export class GuardOrchestrator {
 
       const decision = await this.config.onApprovalRequired(request);
 
+    if (this.fsm.getState() === "timeout") {
+      this.fsm.reset();
+      return {
+        allowed: false,
+        riskLevel: "warn",
+        reason: "HITL approval timed out",
+        matchedRules: scored.matchedRules,
+      };
+    }
+
+    try {
       if (decision === "approve_all") {
         this.fsm.approveAll();
       } else {
         this.fsm.submitDecision(decision);
       }
+    } catch {
+      this.fsm.reset();
+      return {
+        allowed: false,
+        riskLevel: "warn",
+        reason: "HITL approval timed out",
+        matchedRules: scored.matchedRules,
+      };
+    }
 
       const state = this.fsm.getState();
 

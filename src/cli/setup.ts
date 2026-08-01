@@ -17,13 +17,38 @@ function getCredsFilePath(): string {
   return process.env.CCG_CREDS_FILE ?? path.join(getCredsDir(), "credentials.json");
 }
 
-function deriveKey(): Buffer {
+function getKeyFilePath(): string {
+  return path.join(getCredsDir(), ".key");
+}
+
+let _masterKey: Buffer | null = null;
+
+function getOrCreateMasterKey(): Buffer {
+  if (_masterKey) return _masterKey;
+  const keyPath = getKeyFilePath();
+  const dir = getCredsDir();
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (fs.existsSync(keyPath)) {
+    try {
+      _masterKey = fs.readFileSync(keyPath);
+      if (_masterKey.length === KEY_LENGTH) return _masterKey;
+    } catch { /* fall through to regenerate */ }
+  }
+  _masterKey = crypto.randomBytes(KEY_LENGTH);
+  fs.writeFileSync(keyPath, _masterKey);
+  try { fs.chmodSync(keyPath, 0o600); } catch { /* best-effort on Windows */ }
+  return _masterKey;
+}
+
+function deriveLegacyKey(): Buffer {
   const hostname = os.hostname();
   return crypto.pbkdf2Sync(hostname, SALT, 100_000, KEY_LENGTH, "sha256");
 }
 
 function encrypt(plaintext: string): string {
-  const key = deriveKey();
+  const key = getOrCreateMasterKey();
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
   const encrypted = Buffer.concat([cipher.update(plaintext, "utf-8"), cipher.final()]);
@@ -32,20 +57,19 @@ function encrypt(plaintext: string): string {
   return combined.toString("base64");
 }
 
-function decrypt(encoded: string): string {
-  const key = deriveKey();
-  const combined = Buffer.from(encoded, "base64");
-  const iv = combined.subarray(0, IV_LENGTH);
-  const tag = combined.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH);
-  const encrypted = combined.subarray(IV_LENGTH + TAG_LENGTH);
-  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
-  decipher.setAuthTag(tag);
-  const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
-  return decrypted.toString("utf-8");
-}
-
-interface CredentialStore {
-  [provider: string]: string;
+function decryptWithKey(encoded: string, key: Buffer): string | null {
+  try {
+    const combined = Buffer.from(encoded, "base64");
+    const iv = combined.subarray(0, IV_LENGTH);
+    const tag = combined.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH);
+    const encrypted = combined.subarray(IV_LENGTH + TAG_LENGTH);
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+    decipher.setAuthTag(tag);
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return decrypted.toString("utf-8");
+  } catch {
+    return null;
+  }
 }
 
 function readStore(): CredentialStore {
@@ -57,10 +81,24 @@ function readStore(): CredentialStore {
     const raw = fs.readFileSync(filePath, "utf-8");
     const data = JSON.parse(raw);
     const store: CredentialStore = {};
+    const newKey = getOrCreateMasterKey();
+    const oldKey = deriveLegacyKey();
+    let needsRewrite = false;
     for (const [provider, encrypted] of Object.entries(data)) {
-      if (typeof encrypted === "string") {
-        store[provider] = decrypt(encrypted);
+      if (typeof encrypted !== "string") continue;
+      let decrypted = decryptWithKey(encrypted, newKey);
+      if (decrypted === null) {
+        decrypted = decryptWithKey(encrypted, oldKey);
+        if (decrypted !== null) {
+          needsRewrite = true;
+        }
       }
+      if (decrypted !== null) {
+        store[provider] = decrypted;
+      }
+    }
+    if (needsRewrite) {
+      writeStore(store);
     }
     return store;
   } catch {

@@ -58,9 +58,14 @@ describe("checkSandbox", () => {
     expect(result.allowed).toBe(true);
   });
 
-  it("always allows read_file", () => {
-    const result = checkSandbox(readFileAction("/etc/passwd"), config);
+  it("allows read_file inside workspace", () => {
+    const result = checkSandbox(readFileAction(path.join(workspace, "src/file.ts")), config);
     expect(result.allowed).toBe(true);
+  });
+
+  it("blocks read_file outside workspace", () => {
+    const result = checkSandbox(readFileAction("/etc/passwd"), config);
+    expect(result.allowed).toBe(false);
   });
 
   it("empty allowed list allows all shell commands (only blockedCommands apply)", () => {

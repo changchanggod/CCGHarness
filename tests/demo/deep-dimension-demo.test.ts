@@ -108,7 +108,7 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
   describe("Layer 3: GuardOrchestrator — action classification", () => {
     it("safe: read_file passes through guard", async () => {
       const guard = makeGuardOrchestrator();
-      const result = await guard.guard(act("read_file", { path: "src/main.ts" }));
+      const result = await guard.guard(act("read_file", { path: "/tmp/workspace/main.ts" }));
       expect(result.allowed).toBe(true);
       expect(result.riskLevel).toBe("safe");
       expect(result.matchedRules).toEqual([]);
@@ -191,7 +191,7 @@ describe("Mechanism Demo 3: Deep dimension — Governance pipeline (all 4 layers
       const onApprovalRequired = vi.fn(async (_req: ApprovalRequest) => "approve" as const);
       const guard = makeGuardOrchestrator({ onApprovalRequired });
 
-      const safeResult = await guard.guard(act("read_file", { path: "README.md" }));
+      const safeResult = await guard.guard(act("read_file", { path: "/tmp/workspace/README.md" }));
       expect(safeResult.allowed).toBe(true);
       expect(safeResult.riskLevel).toBe("safe");
       expect(safeResult.matchedRules).toEqual([]);

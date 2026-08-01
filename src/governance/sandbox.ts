@@ -20,10 +20,10 @@ export function checkSandbox(action: Action, config: SandboxConfig): SandboxResu
 
   const toolName = action.toolName;
 
-  if (toolName === "write_file") {
+  if (toolName === "write_file" || toolName === "read_file") {
     const filePath = typeof action.parameters?.path === "string" ? action.parameters.path : "";
     if (!filePath) {
-      return { allowed: false, reason: "write_file requires a path parameter" };
+      return { allowed: false, reason: `${toolName} requires a path parameter` };
     }
     const resolved = path.resolve(filePath);
     const resolvedWorkspace = path.resolve(config.workspace);
@@ -34,7 +34,7 @@ export function checkSandbox(action: Action, config: SandboxConfig): SandboxResu
     if (!resolved.startsWith(normalizedWorkspace) && resolved !== resolvedWorkspace) {
       return {
         allowed: false,
-        reason: `write_file path "${resolved}" is outside workspace "${resolvedWorkspace}"`,
+        reason: `${toolName} path "${resolved}" is outside workspace "${resolvedWorkspace}"`,
       };
     }
     return { allowed: true };
