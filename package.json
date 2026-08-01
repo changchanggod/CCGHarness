@@ -27,7 +27,7 @@
   "scripts": {
     "build": "tsc && npm run build:web",
     "start": "node dist-web/web/server.js",
-    "build:sea": "node scripts/build-binary.js",
+    "build:sea": "node scripts/build-binary.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
