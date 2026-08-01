@@ -72,6 +72,10 @@ function decryptWithKey(encoded: string, key: Buffer): string | null {
   }
 }
 
+interface CredentialStore {
+  [provider: string]: string;
+}
+
 function readStore(): CredentialStore {
   const filePath = getCredsFilePath();
   if (!fs.existsSync(filePath)) {
@@ -113,7 +117,9 @@ function writeStore(store: CredentialStore): void {
   }
   const encrypted: Record<string, string> = {};
   for (const [provider, key] of Object.entries(store)) {
-    encrypted[provider] = encrypt(key);
+    if (typeof key === "string") {
+      encrypted[provider] = encrypt(key);
+    }
   }
   const filePath = getCredsFilePath();
   fs.writeFileSync(filePath, JSON.stringify(encrypted, null, 2), "utf-8");
