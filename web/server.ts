@@ -12,7 +12,7 @@ export function startServer(port: number): Promise<Server> {
     app.use(createConfigRouter());
 
     let publicDir = path.resolve(__dirname, "public");
-    if (!fs.existsSync(publicDir)) {
+    if (!fs.existsSync(path.join(publicDir, "index.html"))) {
       publicDir = path.resolve(__dirname, "..", "..", "web", "public");
     }
     app.use(express.static(publicDir));
