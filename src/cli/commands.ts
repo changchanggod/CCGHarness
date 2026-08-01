@@ -110,24 +110,43 @@ export async function createAgentLoop(
     const needsKey = !PROVIDERS_WITHOUT_KEY.has(providerName);
 
     if (needsKey) {
-      const apiKey = await getApiKey(providerName);
+      let apiKey = await getApiKey(providerName);
+      let effectiveProvider = providerName;
+
+      if (!apiKey) {
+        const keyedProviders = ["openai", "anthropic", "deepseek"].filter((p) => p !== providerName);
+        for (const p of keyedProviders) {
+          const key = await getApiKey(p);
+          if (key) {
+            apiKey = key;
+            effectiveProvider = p;
+            if (verbose) {
+              console.log(`[CCG] No key for "${providerName}", auto-selected "${p}" instead.`);
+            }
+            break;
+          }
+        }
+      }
+
       if (!apiKey) {
         throw new Error(
-          `No API key found for provider "${providerName}". Run "ccg setup" to configure.`,
+          `No API key found for any provider. Run "ccg setup" to configure.`,
         );
       }
 
-      const model = config.llm.model || PROVIDER_MODEL_DEFAULTS[providerName] || "gpt-4o";
+      const model = effectiveProvider === providerName
+        ? (config.llm.model || PROVIDER_MODEL_DEFAULTS[effectiveProvider] || "gpt-4o")
+        : (PROVIDER_MODEL_DEFAULTS[effectiveProvider] || "gpt-4o");
       const llmConfig: LLMConfig = (() => {
-        switch (providerName) {
+        switch (effectiveProvider) {
           case "openai":
-            return { provider: providerName, apiKey, model };
+            return { provider: effectiveProvider, apiKey, model };
           case "anthropic":
-            return { provider: providerName, apiKey, model };
+            return { provider: effectiveProvider, apiKey, model };
           case "deepseek":
-            return { provider: providerName, apiKey, model };
+            return { provider: effectiveProvider, apiKey, model };
           default:
-            throw new Error(`Unsupported provider: ${providerName}`);
+            throw new Error(`Unsupported provider: ${effectiveProvider}`);
         }
       })();
       provider = createProvider(llmConfig);
