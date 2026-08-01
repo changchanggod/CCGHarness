@@ -23,12 +23,11 @@ export function attachWebSocket(server: Server): void {
   const wss = new WebSocketServer({ server, path: "/ws" });
 
   wss.on("connection", (ws) => {
-    let hitlResolve: ((decision: ApprovalDecision) => void) | null = null;
+    const hitlResolves: Array<(decision: ApprovalDecision) => void> = [];
 
     ws.on("close", () => {
-      if (hitlResolve) {
-        hitlResolve("deny");
-        hitlResolve = null;
+      for (const resolve of hitlResolves.splice(0)) {
+        resolve("deny");
       }
     });
 
@@ -42,10 +41,10 @@ export function attachWebSocket(server: Server): void {
       }
 
       if (msg.type === "hitl_response") {
-        if (hitlResolve) {
+        const resolve = hitlResolves.shift();
+        if (resolve) {
           const decision = (msg.payload?.decision as ApprovalDecision) ?? "deny";
-          hitlResolve(decision);
-          hitlResolve = null;
+          resolve(decision);
         }
         return;
       }
@@ -69,12 +68,12 @@ export function attachWebSocket(server: Server): void {
                 send(ws, { type: "tool_start", payload: { toolName, params } });
               },
               onToolResult: (toolName, success, output) => {
-                send(ws, { type: "tool_result", payload: { toolName, success, output: output.substring(0, 1000) } });
+                send(ws, { type: "tool_result", payload: { toolName, success, output: (output ?? "").substring(0, 1000) } });
               },
               onApprovalRequired: async (request: ApprovalRequest): Promise<ApprovalDecision> => {
                 send(ws, { type: "hitl_request", payload: { action: request.actionDescription, risk: request.riskLevel } });
                 return new Promise((resolve) => {
-                  hitlResolve = resolve;
+                  hitlResolves.push(resolve);
                 });
               },
             },

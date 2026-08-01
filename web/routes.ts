@@ -45,6 +45,10 @@ export function createConfigRouter(): Router {
   });
 
   router.post("/api/config", (req, res) => {
+    if (!req.body || typeof req.body !== "object") {
+      res.status(400).json({ error: "Request body must be JSON" });
+      return;
+    }
     const { provider, model } = req.body as Record<string, unknown>;
     if (typeof provider !== "string" || !VALID_PROVIDERS.includes(provider)) {
       res.status(400).json({ error: `Invalid provider. Must be one of: ${VALID_PROVIDERS.join(", ")}` });

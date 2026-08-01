@@ -128,9 +128,11 @@ document.getElementById("hitlApproveAll")!.addEventListener("click", () => respo
 (async () => {
   try {
     const res = await fetch("/api/config");
-    const data = await res.json();
-    providerSel.value = data.provider;
-    modelInput.value = data.model;
+    if (res.ok) {
+      const data = await res.json();
+      providerSel.value = data.provider;
+      modelInput.value = data.model;
+    }
   } catch {}
 })();
 
