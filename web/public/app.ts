@@ -5,6 +5,7 @@ const togglePanel = document.getElementById("togglePanel")!;
 const panel = document.getElementById("panel")!;
 const providerSel = document.getElementById("provider") as HTMLSelectElement;
 const modelInput = document.getElementById("model") as HTMLInputElement;
+const apiKeyInput = document.getElementById("apiKey") as HTMLInputElement;
 const saveConfigBtn = document.getElementById("saveConfig")!;
 const hitlModal = document.getElementById("hitlModal")!;
 const hitlAction = document.getElementById("hitlAction")!;
@@ -114,6 +115,23 @@ saveConfigBtn.addEventListener("click", async () => {
     } else {
       const err = await res.json();
       appendMsg(`Config error: ${err.error}`, "error");
+      return;
+    }
+
+    const apiKey = apiKeyInput.value.trim();
+    if (apiKey) {
+      const keyRes = await fetch("/api/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: providerSel.value, apiKey }),
+      });
+      if (keyRes.ok) {
+        apiKeyInput.value = "";
+        appendMsg("API key saved.", "tool");
+      } else {
+        const err = await keyRes.json();
+        appendMsg(`Key error: ${err.error}`, "error");
+      }
     }
   } catch (e) {
     appendMsg(`Config save failed: ${(e as Error).message}`, "error");
@@ -132,6 +150,13 @@ document.getElementById("hitlApproveAll")!.addEventListener("click", () => respo
       const data = await res.json();
       providerSel.value = data.provider;
       modelInput.value = data.model;
+    }
+    const keyRes = await fetch(`/api/credentials/${providerSel.value}`);
+    if (keyRes.ok) {
+      const keyData = await keyRes.json();
+      if (keyData.hasKey) {
+        apiKeyInput.placeholder = "(已保存)";
+      }
     }
   } catch {}
 })();
