@@ -18,6 +18,9 @@ CCGHarness 是 AI4SE 课程项目（Track A: Coding Agent Harness），核心目
 
 ### 环境要求
 
+**二进制文件运行：** 无需额外依赖，单文件即可运行。
+
+**从源码构建：**
 - Node.js 18+
 - npm 或 pnpm
 - **最好在 Windows 系统下运行**（Windows 为推荐/首选运行环境）
@@ -349,7 +352,7 @@ CCGHarness 通过 [Railway](https://railway.app) 部署了 Web 控制台。
 
 ## 已知限制
 
-- 需要 Node.js 18+
+- 二进制文件自包含运行时，无需安装 Node.js；从源码构建需要 Node.js 18+
 - 二进制文件支持 Windows、macOS、Linux（x64）
 - 支持的 LLM Provider：OpenAI、Anthropic、DeepSeek、Ollama
 - Ollama 需要本地运行 Ollama 服务
