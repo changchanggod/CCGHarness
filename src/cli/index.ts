@@ -2,6 +2,16 @@ import { program } from "commander";
 import * as readline from "node:readline";
 import { runTask } from "./commands.js";
 import { setupWizard } from "./setup-wizard.js";
+import { checkApiKey } from "./setup.js";
+
+async function ensureCredentials(): Promise<void> {
+  const providers = ["openai", "anthropic", "deepseek"];
+  for (const p of providers) {
+    if (await checkApiKey(p)) return;
+  }
+  console.log("No API key configured. Let's set one up.\n");
+  await setupWizard();
+}
 
 const pkg = {
   version: "0.1.0",
@@ -20,6 +30,7 @@ program
   .option("-i, --interactive", "Interactive mode", false)
   .action(async (task: string | undefined, options: { config: string; verbose: boolean; interactive: boolean }) => {
     if (options.interactive) {
+      await ensureCredentials();
       await runInteractive(options.config, options.verbose);
       return;
     }
@@ -30,6 +41,7 @@ program
     }
 
     try {
+      await ensureCredentials();
       const result = await runTask(task, options.config, options.verbose);
       console.log(`\n${result}`);
     } catch (e: unknown) {
