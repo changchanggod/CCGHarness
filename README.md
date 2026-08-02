@@ -45,7 +45,7 @@ npm run build
 npm run build:sea
 ```
 
-构建产物：`ccg.exe`（Windows）或 `ccg`（macOS/Linux）。
+构建产物：`ccg.exe`（Windows x64）。
 
 #### 二进制文件使用
 
@@ -353,7 +353,7 @@ CCGHarness 通过 [Railway](https://railway.app) 部署了 Web 控制台。
 ## 已知限制
 
 - 二进制文件自包含运行时，无需安装 Node.js；从源码构建需要 Node.js 18+
-- 二进制文件支持 Windows、macOS、Linux（x64）
+- 二进制文件仅提供 Windows x64 版本（`ccg.exe`）；macOS/Linux 需从源码构建
 - 支持的 LLM Provider：OpenAI、Anthropic、DeepSeek、Ollama
 - Ollama 需要本地运行 Ollama 服务
 - Shell 工具测试使用平台特定命令，跨平台 CI 可能需要适配
