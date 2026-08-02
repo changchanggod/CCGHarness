@@ -16,64 +16,48 @@ CCGHarness 是 AI4SE 课程项目（Track A: Coding Agent Harness），核心目
 
 ## 快速开始
 
-### 环境要求
+### 方式一：使用二进制文件（推荐）
 
-**二进制文件运行：** 无需额外依赖，单文件即可运行。
+**运行环境：** 无需安装任何依赖（Node.js 运行时已打包在二进制中）。仅支持 **Windows x64**。
 
-**从源码构建：**
-- Node.js 18+
-- npm 或 pnpm
-- **最好在 Windows 系统下运行**（Windows 为推荐/首选运行环境）
+**获取方式：**
 
-### 从源码构建
+| 途径 | 说明 |
+|------|------|
+| CI Artifact | 在 [GitHub Actions](https://github.com/changchanggod/CCGHarness/actions) 的 `build-binary` job 下载最新 `ccg.exe` |
+| 从源码构建 | `git clone` → `npm install` → `npm run build:sea`（见下方"方式二"） |
 
-```bash
-git clone https://github.com/changchanggod/CCGHarness.git
-cd CCGHarness
-npm install
-npm run build
+**首次配置 API Key：**
+
+```powershell
+.\ccg.exe setup
 ```
 
-### 使用二进制文件
+按提示选择 provider（openai / anthropic / deepseek / ollama），输入 API Key（隐藏回显）。Key 使用 AES-256-GCM 加密存储于 `~/.ccg/` 目录，不会写入配置文件或日志。
 
-下载对应平台的 `ccg` 二进制文件，放到 PATH 路径下即可运行。
+> 首次运行 `ccg "task"` 或 `ccg --interactive` 时，若未配置任何 Key，会自动启动 setup 引导流程。
 
-#### 构建二进制文件
+**使用命令：**
 
-在[从源码构建](#从源码构建)的基础上
-```bash
-npm run build:sea
-```
-
-构建产物：`ccg.exe`（Windows x64）。
-
-#### 二进制文件使用
-
-```bash
-# 首次使用：配置 API 密钥
-ccg setup
+```powershell
+# 首次配置
+.\ccg.exe setup
 
 # 单次任务
-ccg "将 src/app.ts 中的 getCwd 重命名为 getCurrentWorkingDirectory"
-
-# 指定配置文件
-ccg -c ./my-project/ccg.yaml "修复 auth.test.ts 中的测试失败"
+.\ccg.exe "将 src/app.ts 中的 getCwd 重命名为 getCurrentWorkingDirectory"
 
 # 交互模式（持续对话）
-ccg --interactive
+.\ccg.exe --interactive
 
-# 详细输出（查看 Agent 推理过程）
-ccg -v "为 utils.ts 添加单元测试"
+# 指定配置文件
+.\ccg.exe -c .\my-project\ccg.yaml "修复 auth.test.ts 中的测试失败"
 
-# 查看帮助
-ccg --help
+# 详细输出
+.\ccg.exe -v "为 utils.ts 添加单元测试"
+.\ccg.exe --help
 ```
 
-#### 交互模式命令
-
-```
-ccg --interactive
-```
+**交互模式命令：**
 
 | 命令 | 说明 |
 |------|------|
@@ -82,17 +66,39 @@ ccg --interactive
 | `/h` 或 `/help` | 显示帮助 |
 | `/q` 或 `/quit` | 退出 |
 
-### Web Console
+---
+
+### 方式二：从源码构建
+
+**环境依赖：**
+- Node.js 18+
+- npm
+- Windows 系统（推荐）
+
+```bash
+git clone https://github.com/changchanggod/CCGHarness.git
+cd CCGHarness
+npm install
+npm run build        # 编译 TypeScript → dist/
+npm test             # 运行 248 个单元测试（可选）
+npm run build:sea    # 打包为单文件二进制 → ccg.exe
+```
+
+构建产物 `ccg.exe` 即可独立分发运行。
+
+---
+
+### 方式三：Web Console
+
+**本地启动：**
 
 ```bash
 npm run start:web
 ```
 
-Open `http://localhost:3000` in your browser. Features:
-- Chat interface for task execution
-- Real-time tool execution feedback
-- Provider and model switching via settings panel
-- HITL approval via modal dialog
+打开 `http://localhost:3000`，功能包括：Chat 界面、实时工具状态推送、Provider/Model 设置面板、HITL 审批弹窗。
+
+**云部署：** 已部署于 Railway，公网地址 [ccgharness-production.up.railway.app](https://ccgharness-production.up.railway.app)。注意：Railway 运行于 Linux 环境，Shell 工具可能存在平台差异，推荐本地 Windows 运行。
 
 ## 机制解释
 
