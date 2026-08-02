@@ -18,7 +18,7 @@ CCGHarness 是 AI4SE 课程项目（Track A: Coding Agent Harness），核心目
 
 ### 方式一：使用二进制文件（推荐）
 
-**运行环境：** 无需安装任何依赖（Node.js 运行时已打包在二进制中）。仅支持 **Windows x64**。
+**运行环境：** 无需安装任何依赖（Node.js 运行时已打包在二进制中）。建议 **Windows x64**。
 
 **获取方式：**
 
@@ -322,10 +322,14 @@ CCGHarness/
 │   ├── config/            # 配置加载器测试
 │   ├── cli/               # CLI 测试
 │   └── demo/              # 机制演示测试（guardrail、feedback loop、deep dimension）
+├── docs/
+│   ├── superpowers/specs/SPEC.md    # 设计文档
+│   ├── superpowers/plans/PLAN.md    # 实现计划
+│   ├── SPEC_PROCESS.md              # 规约过程文档
+│   ├── AGENT_LOG.md                 # Agent 日志
+│   └── REFLECTION.md                # 反思报告
 ├── ccg.example.yaml       # 示例配置模板
 ├── guardrails.example.yaml# 示例守护规则
-├── SPEC.md                # 设计文档
-├── PLAN.md                # 实现计划
 └── .github/workflows/     # CI 配置（unit-test 任务）
 ```
 
