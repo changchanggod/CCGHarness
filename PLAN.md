@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Language: TypeScript, strict mode enabled
-- Runtime: Node.js 20+, ESM modules (`"type": "module"`)
+- Runtime: Node.js 18+, CommonJS modules
 - Test framework: vitest, all tests runnable with `npx vitest run`
 - TDD mandatory: write failing test first, then implementation
 - No real LLM in unit tests: all core mechanism tests use MockLLMProvider
@@ -694,3 +694,38 @@ Task 1: Scaffolding
 - Tasks 9, 10, 11, 12 (all tools) can run in parallel
 - Tasks 14, 19, 20 (governance start, feedback, memory) can run in parallel
 - Tasks 24, 25, 26 (demo, CI, distribution) can run in parallel
+
+## Task Completion Record
+
+> 完整实现记录见 `docs/AGENT_LOG.md`。以下为各 task 对应的最终 commit hash。
+
+| Task | Commit | 描述 |
+|------|--------|------|
+| 1 | `b6e0d45` | scaffold project with TypeScript and vitest |
+| 2 | `720acb3` | core type definitions |
+| 3 | `85cc22a` | LLMProvider interface and MockLLMProvider |
+| 4 | `e4a1878` | OpenAI provider |
+| 5 | `0107825` | Anthropic provider |
+| 6 | `0f3b6c4` | Ollama provider |
+| 7 | `338b4af` | provider factory |
+| 8 | `7dc6a0f` | LLM response parser |
+| 9 | `1a94a1b` | read_file tool |
+| 10 | `fea1fd5` | write_file tool |
+| 11 | `d6da2fe` | shell tool |
+| 12 | `9e011e7` | run_tests and run_lint tools |
+| 13 | `ed1c5fd` | configuration loader |
+| 14 | `fdef57e` | command classifier |
+| 15 | `c90e60a` | risk scorer |
+| 16 | `6d67a17` | HITL approval FSM |
+| 17 | `6e3f74d` | sandbox executor |
+| 18 | `e1849fb` | guard orchestrator |
+| 19 | `6f6c149` | feedback validators |
+| 20 | `99a373f` | conversation memory |
+| 21 | `be3dc9f` | context compressor + project context |
+| 22 | `bc88d61` | agent main loop |
+| 23 | `ecae0ff` | CLI entry point |
+| 24 | `3daa0e4` | mechanism demo tests |
+| 25 | `87715b7` | CI configuration (unit-test + build-binary) |
+| 26 | `a0c7d69` | binary distribution (build-binary.mjs) |
+
+**Web Console (额外):** 9 tasks，commit 记录见 `docs/AGENT_LOG.md`。

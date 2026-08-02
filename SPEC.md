@@ -154,7 +154,7 @@ feedback:
   auto_lint: true
   auto_test: true
   test_command: "npm test"
-  lint_command: "npm run lint"
+  lint_command: "npm run typecheck"
 ```
 
 ---
@@ -175,10 +175,12 @@ feedback:
 - 日志泄露 → 任何日志/终端输出不包含 key 明文
 
 **对策：**
-- API key 存储于 OS 凭据管理器（Windows Credential Manager / macOS Keychain / Linux Secret Service）
-- 首次运行交互式引导输入（隐藏回显），写入凭据管理器
-- 运行时从凭据管理器读取，仅用于构建 API 请求，不写入任何文件
-- 支持 `ccg setup` 查看/更新/清除凭据（查看时只显示是否存在，不回显明文）
+- API key 使用 AES-256-GCM 加密存储于 `~/.ccg/credentials.json`
+- 加密密钥为首次运行时随机生成的 32 字节密钥文件（`~/.ccg/.key`，0600 权限）
+- 旧版主机名派生密钥自动迁移至随机密钥方案
+- 首次运行交互式引导输入（隐藏回显），写入加密存储
+- 运行时从加密存储读取，仅用于构建 API 请求，不写入任何文件
+- 支持 `ccg setup` 查看/更新/清除凭据（查看时只显示存在状态，不回显明文）
 - `.env` 文件作为备选来源，文档中明确说明其明文风险
 
 ### 4.3 可用性
@@ -326,11 +328,11 @@ interface CompressedSummary {
 
 ### 7.1 凭据存储
 
-- **主方案**：OS 凭据管理器（Windows Credential Manager / macOS Keychain / Linux Secret Service via `keytar` 或 `security` 命令）
-- **备选方案**：加密文件（AES-256，主密码派生密钥），明文 `.env` 文件（仅开发环境，文档说明风险）
-- **录入流程**：`ccg setup` → 选择 provider → 隐藏输入 key → 存入凭据管理器
-- **更新/清除**：`ccg setup --update` / `ccg setup --clear`
-- **查看**：`ccg setup --status` 显示各 provider 是否已配置（不回显 key）
+- **主方案**：AES-256-GCM 加密文件（`~/.ccg/credentials.json`），加密密钥为随机生成的 32 字节密钥文件（`~/.ccg/.key`，0600 权限）
+- **备选方案**：`.env` 文件（仅开发环境，文档说明明文风险）
+- **录入流程**：`ccg setup` → 选择 provider → 隐藏输入 key → 存入加密文件
+- **更新/清除**：`ccg setup` 交互式选择 set/remove key
+- **查看**：`ccg setup` 启动时显示各 provider 配置状态（不回显 key）
 
 ### 7.2 分发
 

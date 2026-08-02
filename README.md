@@ -116,7 +116,7 @@ Open `http://localhost:3000` in your browser. Features:
 5. 运行反馈验证器（lint、test）
 6. 将结果反馈给 LLM，进入下一轮
 
-循环终止条件：LLM 返回 stop、达到 `max_rounds`、或连续失败达到 `maxConsecutiveFailures`（默认 3）。
+循环终止条件：LLM 返回 stop、达到 `max_rounds`、或连续失败达到 `maxConsecutiveFailures`（默认 5）。
 
 ### 治理管道（Governance）
 
@@ -220,7 +220,7 @@ feedback:
   auto_lint: true
   auto_test: true
   test_command: "npm test"
-  lint_command: "npm run lint"
+  lint_command: "npm run typecheck"
 ```
 
 ### guardrails.yaml
@@ -285,7 +285,7 @@ llm:
 ## 凭证安全
 
 - API Key 使用 AES-256-GCM 加密存储于 `~/.ccg/credentials.json`
-- 加密密钥由主机名派生（PBKDF2，100,000 次迭代）
+- 加密密钥为随机生成的 32 字节密钥文件（`~/.ccg/.key`，0600 权限）
 - 绝不在配置文件、源码或日志中存储明文密钥
 - `.env` 文件作为备选方案，但文档标注明文风险
 - 每次提交前检查无凭证泄露
@@ -328,7 +328,7 @@ npx vitest                 # 监听模式
 npx vitest run             # 单次运行
 ```
 
-235 个测试覆盖所有核心模块，均可通过 mock LLM 确定性运行。
+248 个测试覆盖所有核心模块，均可通过 mock LLM 确定性运行。
 
 ## 设计原则
 
